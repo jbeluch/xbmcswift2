@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+  <!-- Plugin name -->
+  <string id="30000">Hello XBMC</string>
+  <!-- List item titles and dialog progress strings -->
+  <string id="30100">View all results</string>
+  <!--<string id="30101">Downloading lecture info...</string>-->
+  <!--<string id="30102">Downloading course/lecture info...</string>-->
+</strings>

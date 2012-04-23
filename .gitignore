@@ -1,0 +1,10 @@
+load-dev-env.sh
+*.pyo
+*.pyc
+*.swp
+*.swo
+lib/dist/
+lib/build/
+lib/XBMC_Swift.egg-info/
+lib/docs/_build/
+TODO
