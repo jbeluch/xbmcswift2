@@ -41,7 +41,7 @@ class TestPluginInit(TestCase):
         self.assertEqual(plugin._mode, Modes.ONCE)
         mock_Request.assert_called_with('plugin://plugin.id/home/', '0', '?foo=bar')
         mock_load_addon_strings.assert_called_with('Mock Addon', 'resources/language/English/strings.xml')
-        mock_translatePath.assert_called_with('special://profile/addon_data/plugin.id/.cache')
+        mock_translatePath.assert_called_with('special://profile/addon_data/plugin.id/.cache/')
 
     @patch('xbmcswift2.console.parse_commandline')
     @patch('xbmcswift2.xbmcaddon.Addon')

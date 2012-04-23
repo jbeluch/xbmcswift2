@@ -43,7 +43,7 @@ class TestAsXBMC(TestCase):
         self.assertEqual('plugin.video.helloxbmc', plugin.id)
         self.assertEqual('Hello XBMC', plugin.name)
         assert isinstance(plugin.addon, xbmcaddon.Addon)
-        self.assertEqual('/tmp/xbmcswift2_debug/profile/addon_data/plugin.video.helloxbmc/.cache', plugin.cache_path)
+        self.assertEqual('/tmp/xbmcswift2_debug/profile/addon_data/plugin.video.helloxbmc/.cache/', plugin.cache_path)
         self.assertEqual([], plugin.added_items)
         self.assertEqual(0, plugin.handle)
         self.assertEqual(Modes.XBMC, plugin._mode)

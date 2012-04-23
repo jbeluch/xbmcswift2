@@ -142,3 +142,17 @@ class TestAddToPlaylist(TestCase):
         for item, call_args in zip(items, self.mock_playlist.add.call_args_list):
             self.assertEqual((item.get_path(), item.as_xbmc_listitem(), 0), call_args)
 
+    @patch('xbmcswift2.xbmcmixin.xbmc')
+    def test_get_view_mode_id(self, _xbmc):
+        _xbmc.getSkinDir.return_value = 'skin.confluence'
+        self.assertEqual(self.m.get_view_mode_id('thumbnail'), 500)
+        self.assertEqual(self.m.get_view_mode_id('THUMBNail'), 500)
+        self.assertEqual(self.m.get_view_mode_id('unknown'), None)
+        _xbmc.getSkinDir.return_value = 'skin.unknown'
+        self.assertEqual(self.m.get_view_mode_id('thumbnail'), None)
+        self.assertEqual(self.m.get_view_mode_id('unknown'), None)
+
+    @patch('xbmcswift2.xbmcmixin.xbmc')
+    def test_set_view_mode(self, _xbmc):
+        self.m.set_view_mode(500)
+        _xbmc.executebuiltin.assertCalledWith('Container.SetViewMode(500)')

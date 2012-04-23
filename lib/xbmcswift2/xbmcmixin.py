@@ -8,6 +8,7 @@ from functools import wraps
 import xbmcswift2
 from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
 from xbmcswift2.cache import Cache, TimedCache
+from xbmcswift2.constants import VIEW_MODES
 from common import Modes, DEBUG_MODES
 from console import parse_commandline
 from request import Request
@@ -81,7 +82,7 @@ class XBMCMixin(object):
         return os.path.join(self.cache_path, path)
 
     def temp_fn(self, path):
-        return os.path.join(xbmc.translatePath('special://temp'), path)
+        return os.path.join(xbmc.translatePath('special://temp/'), path)
 
     def get_string(self, stringid):
         '''Returns the localized string from strings.xml for the given
@@ -128,6 +129,22 @@ class XBMCMixin(object):
             _items.append(item)
             selected_playlist.add(item.get_path(), item.as_xbmc_listitem())
         return _items
+
+    def get_view_mode_id(self, view_mode):
+        '''Attempts to return a view_mode_id for a given view_mode
+        taking into account the current skin. If not view_mode_id can
+        be found, None is returned. 'thumbnail' is currently the only
+        suppported view_mode.
+        '''
+        view_mode_ids = VIEW_MODES.get(view_mode.lower())
+        if view_mode_ids:
+            return view_mode_ids.get(xbmc.getSkinDir())
+        return None
+
+    def set_view_mode(self, view_mode_id):
+        '''Calls XBMC's Container.SetViewMode. Requires an integer
+        view_mode_id'''
+        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
     def set_resolved_url(self, url):
         item = xbmcswift2.ListItem(path=url)
@@ -190,7 +207,7 @@ class XBMCMixin(object):
         assert False, 'Already called endOfDirectory.'
 
     def finish(self, items=None, sort_methods=None, succeeded=True,
-               update_listing=False, cache_to_disc=True):
+               update_listing=False, cache_to_disc=True, view_mode=None):
         '''Adds the provided items to the XBMC interface. Each item in
         the provided list should either be an instance of
         xbmcswift2.ListItem or a dictionary that will be passed to
@@ -200,6 +217,10 @@ class XBMCMixin(object):
         reamaining keyword arguments are passed along to
         xbmcplugin.endOfDirectory.
 
+        view_mode can either be an integer (or parseable integer
+        string) corresponding to a view_mode or the name of a type of
+        view. Currrently the only view type supported is 'thumbnail'.
+
         Returns a list of all ListItems added to the XBMC interface.
         '''
         # If we have any items, add them. Items are optional here.
@@ -208,6 +229,18 @@ class XBMCMixin(object):
         if sort_methods:
             for sort_method in sort_methods:
                 xbmcplugin.addSortMethod(self.handle, sort_method)
+
+        # Attempt to set a view_mode if given
+        if view_mode is not None:
+            # First check if we were given an integer or parseable integer
+            try:
+                view_mode_id = int(view_mode)
+            except ValueError:
+                # Attempt to lookup a view mode
+                view_mode_id = self.get_view_mode_id(view_mode)
+
+            if view_mode_id is not None:
+                self.set_view_mode(view_mode_id)
 
         # Finalize the directory items
         xbmcplugin.endOfDirectory(self.handle, succeeded,
