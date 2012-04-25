@@ -11,6 +11,7 @@ except ImportError:
     from cgi import parse_qs
 
 from listitem import ListItem
+from log import log
 from common import enum
 from common import clean_dict
 from console import parse_commandline, display_video
@@ -189,7 +190,9 @@ class Plugin(XBMCMixin):
             Modes.CRAWL: self._crawl,
             Modes.INTERACTIVE: self._interactive,
         }
-        return dispatcher[self._mode](self.request.path)
+        request_handler = dispatcher[self._mode]
+        log.debug('Dispatching %s to %s' %(self.request.path, request_handler.__name__))
+        return request_handler(self.request.path)
 
     def register_module(self, module, url_prefix):
         '''Registers a module with a plugin. Requires a url_prefix that
@@ -219,8 +222,10 @@ class Plugin(XBMCMixin):
         rule = UrlRule(url_rule, view_func, name, options)
         if name in self._view_functions.keys():
             # TODO: Raise exception for ambiguous views during registration
+            log.warning('Cannot add url rule "%s" with name "%s". There is already a view with that name' % (url_rule, name))
             self._view_functions[name] = None
         else:
+            log.debug('Adding url rule "%s" named "%s" pointing to function "%s"' % (url_rule, name, view_func.__name__))
             self._view_functions[name] = rule
         self._routes.append(rule)
 
@@ -253,6 +258,7 @@ class Plugin(XBMCMixin):
             #return view_func(**items)
             #TODO: allow returns just dictionaries that will be passed to
             #      plugin.finish()
+            log.info('Request for "%s" matches rule for function "%s"' % (path, view_func.__name__))
             listitems = view_func(**items)
             if self._mode in DEBUG_MODES:
                 display_listitems([item for item in listitems if

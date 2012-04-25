@@ -18,6 +18,19 @@ def _create_dir(path):
             raise
 
 
+def log(msg, level=0):
+    levels = [
+        'LOGDEBUG',
+        'LOGINFO',
+        'LOGNOTICE',
+        'LOGWARNING',
+        'LOGERROR',
+        'LOGSEVERE',
+        'LOGFATAL',
+        'LOGNONE',
+    ]
+    #print '%s - %s' % (levels[level], msg)
+
 def translatePath(path):
     '''Creates folders in the OS's temp directory. Doesn't touch any
     possible XBMC installation on the machine. Attempting to do as

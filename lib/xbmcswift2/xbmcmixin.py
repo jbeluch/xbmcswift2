@@ -8,6 +8,7 @@ from functools import wraps
 import xbmcswift2
 from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
 from xbmcswift2.cache import Cache, TimedCache
+from xbmcswift2.log import log
 from xbmcswift2.constants import VIEW_MODES
 from common import Modes, DEBUG_MODES
 from console import parse_commandline
@@ -48,9 +49,10 @@ class XBMCMixin(object):
 
                 try:
                     result = cache[key]
-                    print 'Cache hit!'
+                    #log.debug('Cache hit for key "%s"' % (key, ))
+                    log.debug('Cache hit for function "%s" with args "%s" and kwargs "%s"' % (function.__name__, args, kwargs))
                 except KeyError:
-                    print 'Cache miss :('
+                    log.debug('Cache miss for function "%s" with args "%s" and kwargs "%s"' % (function.__name__, args, kwargs))
                     result = function(*args, **kwargs)
                     cache[key] = result
                 cache.sync()
@@ -64,9 +66,11 @@ class XBMCMixin(object):
         filename = os.path.join(self.cache_path, cache_name)
         try:
             cache = self._unsynced_caches[filename]
+            log.debug('Used live cache "%s" located at "%s"' % (cache_name, filename))
         except KeyError:
             cache = cache_type(filename, **kwargs)
             self._unsynced_caches[filename] = cache
+            log.debug('Used cold cache "%s" located at "%s"' % (cache_name, filename))
         return cache
 
     def get_timed_cache(self, cache_name, file_format='pickle', ttl=None):
@@ -249,6 +253,7 @@ class XBMCMixin(object):
         # Close any open caches which will persist them to disk
         if hasattr(self, '_unsynced_caches'):
             for cache in self._unsynced_caches.values():
+                log.debug('Saving a %s cache to disk at "%s"' % (cache.file_format, cache.filename))
                 cache.close()
 
         # Return the cached list of all the list items that were added

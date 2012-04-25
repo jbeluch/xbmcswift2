@@ -15,6 +15,7 @@ import pickle
 import shutil
 import collections
 from datetime import datetime
+from xbmcswift2.log import log
 
 
 class PersistentDictMixin(object):
@@ -36,6 +37,7 @@ class PersistentDictMixin(object):
         self.file_format = file_format      # 'csv', 'json', or 'pickle'
         self.filename = filename
         if flag != 'n' and os.access(filename, os.R_OK):
+            log.debug('Reading %s cache from disk at "%s"' % (self.file_format, self.filename))
             fileobj = open(filename, 'rb' if file_format == 'pickle' else 'r')
             with fileobj:
                 self.load(fileobj)

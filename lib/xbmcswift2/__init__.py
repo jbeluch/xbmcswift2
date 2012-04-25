@@ -19,9 +19,10 @@ except ImportError:
     from mock import MockClass
 
     # xbmc module
-    from mockxbmc.xbmc import translatePath
+    from mockxbmc.xbmc import translatePath, log
     xbmc = MockClass()
     xbmc.translatePath = translatePath
+    xbmc.log = log
 
     # xbmcgui module
     xbmcgui = MockClass()
