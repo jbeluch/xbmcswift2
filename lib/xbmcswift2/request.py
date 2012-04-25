@@ -16,5 +16,9 @@ class Request(object):
         self.handle = int(handle)
         self.query_string = query_string.lstrip('?')
         self.args = unpickle_dict(parse_qs(self.query_string))
-        parts = urlparse(url)
-        self.scheme, self.netloc, self.path = parts[0], parts[1], parts[2]
+
+        # urlparse doesn't like the 'plugin' scheme, so pass a protocol
+        # relative url, e.g. //plugin.video.helloxbmc/path
+        self.scheme, remainder = url.split(':', 1)
+        parts = urlparse(remainder)
+        _, self.netloc, self.path = parts[0], parts[1], parts[2]
