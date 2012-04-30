@@ -3,6 +3,12 @@ A fabric file to automate creation of a special distribution of
 xbmcswift2 for XBMC. This distribution doesn't include docs and tests.
 It has a slightly different folder structure and contains some XBMC
 specific files.
+
+Usage:
+    # Create a new release for Dharma
+    $ fab release:dharma,prepare
+    # Edit the changelog.txt in the temp directory and `git add` it
+    $ fab release:dharma,perform
 '''
 import tempfile
 import shutil
