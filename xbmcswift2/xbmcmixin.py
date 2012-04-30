@@ -11,9 +11,7 @@ from xbmcswift2.cache import Cache, TimedCache
 from xbmcswift2.log import log
 from xbmcswift2.constants import VIEW_MODES
 from common import Modes, DEBUG_MODES
-from console import parse_commandline
 from request import Request
-from console import parse_commandline, display_video
 
 
 class XBMCMixin(object):

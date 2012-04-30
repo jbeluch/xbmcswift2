@@ -8,7 +8,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from optparse import OptionParser
-from common import Modes
+from xbmcswift2.common import Modes
 
 
 def display_listitems(items):
@@ -43,49 +43,10 @@ def get_user_choice(items):
     return None
 
 
-def continue_or_quit(item):
+def continue_or_quit():
     '''Prints an exit message and returns False if the user wants to
     quit.
     '''
-    print '[Next Item] %s' % item
     return raw_input('Enter to continue or "q" to quit') != 'q'
 
 
-def parse_commandline(args, plugin_id):
-    ''' %prog%
-    %prog% [MODE]
-    %prog% [MODE] [URL]
-    %prog% [MODE] [URL] [QS]
-    %prog% [URL]
-    %prog% [URL] [QS]
-
-    TODO: make it so help actually works!
-    '''
-    parser = OptionParser()
-    parser.description = __doc__
-
-    parser.set_usage('usage: %prog [once|crawl|interactive] [<url>'
-                     ' [<query_string>]]')
-
-    _, args = parser.parse_args(args)
-
-    # SET UP DEFAULTS
-    mode = Modes.ONCE
-    url = 'plugin://%s/' % plugin_id
-    handle = '0'
-    query_string = '?'  # default to '?' instead of empty string since that's
-                        # what XBMC does
-
-    # If first arg is a valid mode, then consume it and set the mod
-    if args and hasattr(Modes, args[0].upper()):
-        mode = getattr(Modes, args.pop(0).upper())
-
-    # if we still have args, parse url
-    if args:
-        url = args.pop(0)
-
-    # if we still have args, parse query_string
-    if args:
-        query_string = args.pop(0)
-
-    return mode, [url, handle, query_string]

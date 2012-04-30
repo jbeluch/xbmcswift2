@@ -47,8 +47,6 @@ except ImportError:
 from request import Request
 from common import (pickle_dict, unpickle_dict, clean_dict,
     download_page, unhex)
-from console import (display_listitems, get_user_choice, display_video,
-    continue_or_quit)
 import constants
 from plugin import Plugin, Modes
 from xbmcmixin import XBMCMixin

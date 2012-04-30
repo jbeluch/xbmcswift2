@@ -14,15 +14,10 @@ from listitem import ListItem
 from log import log
 from common import enum
 from common import clean_dict
-from console import parse_commandline, display_video
 from urls import UrlRule, NotFoundException, AmbiguousUrlException
-from xbmcswift2 import (xbmc, xbmcgui, xbmcplugin, xbmcaddon, Request,
-    display_listitems, get_user_choice, display_video, continue_or_quit)
+from xbmcswift2 import (xbmc, xbmcgui, xbmcplugin, xbmcaddon, Request,)
+    
 from xbmcmixin import XBMCMixin
-
-
-#Modes = enum('XBMC', 'ONCE', 'CRAWL', 'INTERACTIVE')
-#DEBUG_MODES = [Modes.ONCE, Modes.CRAWL, Modes.INTERACTIVE]
 from common import Modes, DEBUG_MODES
 
 
@@ -30,8 +25,7 @@ class Plugin(XBMCMixin):
     '''Encapsulates all the properties and methods necessary for running an
     XBMC plugin.'''
 
-    def __init__(self, name, addon_id, filepath, strings_fn=None,
-                 testing=False):
+    def __init__(self, name, addon_id, filepath, strings_fn=None):
         '''Initialize a plugin object for an XBMC addon. The required
         parameters are plugin name, addon_id, and filepath of the
         python file (typically in the root directory.
@@ -50,12 +44,6 @@ class Plugin(XBMCMixin):
         self._view_functions = {}
         self._addon = xbmcaddon.Addon(id=self._addon_id)
         self._current_items = []  # Keep track of added list items
-
-        # If testing mode is enabled, it is the responsibility of the developer
-        # to call plugin.test() to set up the proper state. A mode and an
-        # arguments list can be passed directly.
-        if not testing:
-            self._parse_args()
 
         # There will always be one request in each python thread...however it
         # should be moved out of plugin...
@@ -78,6 +66,9 @@ class Plugin(XBMCMixin):
     def added_items(self):
         return self._current_items
 
+    def clear_added_items(self):
+        self._current_items = []
+
     @property
     def handle(self):
         return self.request.handle
@@ -97,102 +88,21 @@ class Plugin(XBMCMixin):
         This method never needs to be called directly. For testing, see
         plugin.test()
         '''
-        if mode is not None and args is not None:
-            # being called from a test
-            self._mode = mode
-            _, args = parse_commandline(args, self.id)
-            # let args fall through already assigned in the method call
-        elif xbmcswift2.CLI_MODE:
-            ## In CLI mode, ignore first arg as it is the program name
-            self._mode, args = parse_commandline(sys.argv[1:], self.id)
-        else:
-            # in xbmc mode, we are missing the first arg as program name
-            self._mode = Modes.XBMC
-            args = sys.argv
-        self._request = Request(*args)
-
-        # If we are on the command line, attempt to load the strings.xml so
-        # calls to plugin.get_string still work correctly.
-        if self._mode in DEBUG_MODES:
-            from xbmcswift2.mockxbmc import utils
-            if self._strings_fn is None:
-                self._strings_fn = os.path.join(
-                    os.path.dirname(self._filepath), 'resources', 'language',
-                    'English', 'strings.xml')
-            utils.load_addon_strings(self._addon, self._strings_fn)
-
-    def _fake_run(self, url):
-        '''Manually sets some vars on the current instance. Used instead of
-        calling __init__ on an instance.'''
-        # Need to re-initialize some things each time through since we aren't
-        # creating a new plugin instance
-
-        self._current_items = []  # Clear the list of currently added items
-        query_string = ''
-        if '?' in url:
-            url, query_string = url.split('?', 1)
-        #args = [url, self.request.handle, query_string]
-        args = [url]
-        if self._mode == Modes.XBMC:
-            # Need to fake differently for XBMC, used for redirect command
-            # TODO: fix this
-            args.extend([self.request.handle, query_string])
-            sys.argv = args
-            self._parse_args()
-            return self.run()
-        return self.test(Modes.ONCE, args)
-
-    def _interactive(self, path):
-        '''Provides an interactive menu from the command line that emulates the
-        simple list-like interface within XBMC.'''
-        # First run the initial path
-        items = [item for item in self._dispatch(path)
-                 if not item.get_played()]
-
-        selected_item = get_user_choice(items)
-        while selected_item is not None:
-            items = [item for item in self._fake_run(selected_item.get_path())]
-            selected_item = get_user_choice(items)
-
-    def _crawl(self, path):
-        '''Performs a breadth-first crawl of all possible routes from the
-        starting path. Will only visit a URL once, even if it is referenced
-        multiple times in a plugin. Requires user interaction in between each
-        fetch.
-        '''
-        visited = []
-        to_visit = self._dispatch(path)
-        item = to_visit.pop(0)
-
-        while to_visit and continue_or_quit(item):
-            visited.append(item)
-
-            # Run the new listitem
-            items = self._fake_run(item.get_path())
-
-            # Filter new items by checking against urls_visited and
-            # urls_tovisit
-            unvisited = [item for item in items
-                         if item not in visited and item not in to_visit]
-            to_visit.extend(unvisited)
-            item = to_visit.pop(0)
-
-    def test(self, mode, args):
-        '''The main entry point for a plugin.'''
-        self._parse_args(mode, args)
-        return self.run()
+        # Always XBMC Mode
+        url = sys.argv[0] + sys.argv[3]
+        handle = sys.arv[1]
+        self._request = Request(url, handle)
 
     def run(self):
         '''The main entry point for a plugin.'''
-        dispatcher = {
-            Modes.XBMC: self._dispatch,
-            Modes.ONCE: self._dispatch,
-            Modes.CRAWL: self._crawl,
-            Modes.INTERACTIVE: self._interactive,
-        }
-        request_handler = dispatcher[self._mode]
-        log.debug('Dispatching %s to %s' %(self.request.path, request_handler.__name__))
-        return request_handler(self.request.path)
+        if xbmcswift2.CLI_MODE:
+            from xbmcswift2.cli import app
+            app.plugin_runner(self)
+        else:
+            self._parse_args()
+            request_handler = self._dispatch
+            log.debug('Dispatching %s to %s' %(self.request.path, request_handler.__name__))
+            return request_handler(self.request.path)
 
     def register_module(self, module, url_prefix):
         '''Registers a module with a plugin. Requires a url_prefix that
@@ -260,13 +170,40 @@ class Plugin(XBMCMixin):
             #      plugin.finish()
             log.info('Request for "%s" matches rule for function "%s"' % (path, view_func.__name__))
             listitems = view_func(**items)
-            if self._mode in DEBUG_MODES:
-                display_listitems([item for item in listitems if
-                    isinstance(item, ListItem) and not item.get_played()])
             return listitems
-        raise NotFoundException
+        raise NotFoundException, 'No matching view found for %s' % path
 
     def redirect(self, url):
         '''Used when you need to redirect to another view, and you only
         have the final plugin:// url.'''
-        return self._fake_run(url)
+        pass
+
+
+
+'''
+Plugin - keeps track of views for the plugin and has a property pointing to the current request
+XBMCMixin - a bunch of stateless methods
+
+PluginResponse
+
+
+never should be plugin.add_items
+should be Response().add_items()
+
+
+plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc')
+
+plugin.route('/')
+def main_menu():
+    return {
+        'label': 'Welcome to new app!',
+    }
+
+plugin.route('/videos')
+def main_menu():
+    resp = PluginResponse()
+    resp.add_items(items)
+    # do more stuff
+    resp.add_items(items2)
+    return resp
+'''

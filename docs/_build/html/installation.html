@@ -1,0 +1,143 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation &mdash; XBMC Swift 1.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="XBMC Swift 1.0.1 documentation" href="index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">XBMC Swift 1.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The quickest (and best) option for installing xbmcswift depends on Python 2.5
+or higher and virtualenv.</p>
+<div class="section" id="virtualenv">
+<h2>virtualenv<a class="headerlink" href="#virtualenv" title="Permalink to this headline">¶</a></h2>
+<p>Virtualenv is an awesome tool that enables clean installation and removal of
+python libraries into a &#8220;virtual environment&#8221;. Using a virtual environment
+means that when you install a library, it doesn&#8217;t pollute your system-wide
+python installation. This makes it possible to install different versions of
+library in different environments and they will never conflict.</p>
+<p>If you already have pip installed, you can simply:</p>
+<div class="highlight-python"><pre>$ sudo pip install virtualenv</pre>
+</div>
+<p>or if you only have easy_install:</p>
+<div class="highlight-python"><pre>$ sudo easy_install virtualenv</pre>
+</div>
+<p>I also like to use some helpful virtualenv scripts, so install
+virtualenv-wrapper:</p>
+<div class="highlight-python"><pre>$ sudo pip install virtualenv-wrapper</pre>
+</div>
+</div>
+<div class="section" id="creating-a-virtual-environment">
+<h2>Creating a Virtual Environment<a class="headerlink" href="#creating-a-virtual-environment" title="Permalink to this headline">¶</a></h2>
+<p>Now we can create our virtualenv:</p>
+<div class="highlight-python"><pre>$ mkvirtualenv xbmcswift</pre>
+</div>
+<p>When this completes, your prompt should now be preceded by <cite>(xbmcswift)</cite>.
+Now we install xbmcswift:</p>
+<div class="highlight-python"><pre>$ pip install xbmcswift</pre>
+</div>
+<p>Everything should be good to go. When you would like to work on your project
+again, simply:</p>
+<div class="highlight-python"><pre>$ workon xbmcswift</pre>
+</div>
+<p>and to deactive the virtualenv:</p>
+<div class="highlight-python"><pre>$ deactivatee</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#virtualenv">virtualenv</a></li>
+<li><a class="reference internal" href="#creating-a-virtual-environment">Creating a Virtual Environment</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/installation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, Jonathan Beluch.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>
