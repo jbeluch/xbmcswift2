@@ -29,7 +29,6 @@ class XBMCMixin(object):
     _memoized_cache = None
     _unsynced_caches = None
     '''
-
     def cache(self, ttl_hours=24):
         '''View caching decorator. Currently must be closest to the
         view because route decorators don't wrap properly.

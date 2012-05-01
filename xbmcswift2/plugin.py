@@ -16,6 +16,7 @@ from common import enum
 from common import clean_dict
 from urls import UrlRule, NotFoundException, AmbiguousUrlException
 from xbmcswift2 import (xbmc, xbmcgui, xbmcplugin, xbmcaddon, Request,)
+from xbmcswift2.log import setup_log
 
 from xbmcmixin import XBMCMixin
 from common import Modes, DEBUG_MODES
@@ -39,6 +40,9 @@ class Plugin(XBMCMixin):
         self._current_items = []  # Keep track of added list items
         self._request = None  # Initialized when plugin.run() is called
 
+        # set up logger
+        self._log = setup_log(addon_id)
+
         # There will always be one request in each python thread...however it
         # should be moved out of plugin...
         self._cache_path = xbmc.translatePath(
@@ -51,6 +55,10 @@ class Plugin(XBMCMixin):
             utils.load_addon_strings(self._addon,
                 os.path.join(os.path.dirname(self._filepath), 'resources',
                              'language', 'English', 'strings.xml'))
+
+    @property
+    def log(self):
+        return self._log
 
     @property
     def id(self):
