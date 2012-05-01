@@ -48,5 +48,3 @@ def continue_or_quit():
     quit.
     '''
     return raw_input('Enter to continue or "q" to quit') != 'q'
-
-

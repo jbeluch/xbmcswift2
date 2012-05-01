@@ -41,8 +41,7 @@ def plugin_runner(plugin):
 def patch_plugin(plugin, path, handle=None):
     if handle is None:
         handle = plugin.request.handle
-    plugin._request = Request(path, handle) 
-    #return plugin._dispatch(plugin.request.path)
+    plugin._request = Request(path, handle)
 
 def once(plugin):
     plugin.clear_added_items()
@@ -79,7 +78,7 @@ def crawl(plugin):
         # Run the new listitem
         patch_plugin(plugin, path)
         new_paths = set(item.get_path() for item in once(plugin))
-            
+
         # Filter new items by checking against urls_visited and
         # urls_tovisit
         paths_to_visit.update(path for path in new_paths
@@ -95,7 +94,7 @@ def parse_cli():
     #parser.add_option('-q', '--quiet', action='store_true')
     #parser.add_option('-v', '--verbose', action='store_true')
     #parser.add_option('-V', '--version', action='store_true')
-    
+
     opts, args = parser.parse_args()
 
     mode = Modes.ONCE
