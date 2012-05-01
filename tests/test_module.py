@@ -10,12 +10,12 @@ TEST_STRINGS_FN = os.path.join(os.path.dirname(__file__), 'data', 'strings.xml')
 def create_plugin_module():
         module = Module('namespace')
         sys.argv = ['./addon.py']
-        plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', __file__, TEST_STRINGS_FN)
+        plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', __file__)
         return plugin, module
 
 
 class TestModule(TestCase):
-    
+
     def test_init(self):
         module = Module('my.module.namespace')
         self.assertEqual('namespace', module._namespace)
@@ -34,8 +34,10 @@ class TestModule(TestCase):
         self.assertEqual(module.plugin, plugin)
         self.assertEqual(module.addon, plugin.addon)
         self.assertEqual(module.added_items, plugin.added_items)
-        self.assertEqual(module.handle, plugin.request.handle)
-        self.assertEqual(module.request, plugin.request)
+
+        # no request registered yet
+        self.assertRaises(Exception, getattr, module, 'handle')
+        self.assertRaises(Exception, getattr, module, 'request')
         self.assertEqual(module.url_prefix, 'module/')
 
 
