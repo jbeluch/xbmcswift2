@@ -37,6 +37,7 @@ class Plugin(XBMCMixin):
         self._view_functions = {}
         self._addon = xbmcaddon.Addon(id=self._addon_id)
         self._current_items = []  # Keep track of added list items
+        self._request = None  # Initialized when plugin.run() is called
 
         # There will always be one request in each python thread...however it
         # should be moved out of plugin...
@@ -68,34 +69,31 @@ class Plugin(XBMCMixin):
 
     @property
     def request(self):
+        if self._request is None:
+            raise Exception('There is no request attached to this plugin yet.'
+                            ' It appears `plugin.run()` has not been called.')
         return self._request
 
     @property
     def name(self):
         return self._name
 
-    def _parse_args(self, mode=None, args=None):
+    def _parse_request(self, url=None, handle=None):
         '''Handles setup of the plugin state, including request
         arguments, handle, mode.
 
         This method never needs to be called directly. For testing, see
         plugin.test()
         '''
-        # Always XBMC Mode
-        url = sys.argv[0] + sys.argv[3]
-        handle = sys.arv[1]
-        self._request = Request(url, handle)
-
-    def run(self):
-        '''The main entry point for a plugin.'''
-        if xbmcswift2.CLI_MODE:
-            from xbmcswift2.cli import app
-            app.plugin_runner(self)
-        else:
-            self._parse_args()
-            request_handler = self._dispatch
-            log.debug('Dispatching %s to %s' %(self.request.path, request_handler.__name__))
-            return request_handler(self.request.path)
+        # To accomdate self.redirect, we need to be able to parse a full url as
+        # well
+        if url is None:
+            url = sys.argv[0]
+            if len(sys.argv) == 3:
+                url += sys.argv[2]
+        if handle is None:
+            handle = sys.argv[1]
+        return Request(url, handle)
 
     def register_module(self, module, url_prefix):
         '''Registers a module with a plugin. Requires a url_prefix that
@@ -108,6 +106,7 @@ class Plugin(XBMCMixin):
     def route(self, url_rule, name=None, options=None):
         '''A decorator to add a route to a view. name is used to
         differentiate when there are multiple routes for a given view.'''
+        # TODO: change options kwarg to defaults
         def decorator(f):
             view_name = name or f.__name__
             self.add_url_rule(url_rule, f, name=view_name, options=options)
@@ -147,6 +146,7 @@ class Plugin(XBMCMixin):
 
         rule = self._view_functions[endpoint]
         if not rule:
+            # TODO: Make this a regular exception
             raise AmbiguousUrlException
 
         pathqs = rule.make_path_qs(items)
@@ -179,24 +179,12 @@ XBMCMixin - a bunch of stateless methods
 
 PluginResponse
 
-
-never should be plugin.add_items
-should be Response().add_items()
-
-
-plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc')
-
-plugin.route('/')
-def main_menu():
-    return {
-        'label': 'Welcome to new app!',
-    }
-
-plugin.route('/videos')
-def main_menu():
-    resp = PluginResponse()
-    resp.add_items(items)
-    # do more stuff
-    resp.add_items(items2)
-    return resp
-'''
+    def run(self):
+        '''The main entry point for a plugin.'''
+        if xbmcswift2.CLI_MODE:
+            from xbmcswift2.cli import app
+            app.plugin_runner(self)
+        else:
+            self._request = self._parse_request()
+            log.debug('Handling incoming request for %s' % (self.request.path))
+            return self._dispatch(self.request.path)
