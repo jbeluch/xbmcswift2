@@ -16,7 +16,7 @@ from common import enum
 from common import clean_dict
 from urls import UrlRule, NotFoundException, AmbiguousUrlException
 from xbmcswift2 import (xbmc, xbmcgui, xbmcplugin, xbmcaddon, Request,)
-    
+
 from xbmcmixin import XBMCMixin
 from common import Modes, DEBUG_MODES
 
@@ -25,21 +25,14 @@ class Plugin(XBMCMixin):
     '''Encapsulates all the properties and methods necessary for running an
     XBMC plugin.'''
 
-    def __init__(self, name, addon_id, filepath, strings_fn=None):
+    def __init__(self, name, addon_id, filepath):
         '''Initialize a plugin object for an XBMC addon. The required
         parameters are plugin name, addon_id, and filepath of the
-        python file (typically in the root directory.
-
-        strings_fn can be a full filepath to a strings.xml used only
-        when testing plugins in the command line.
-
-        if testing=True, then the caller will be responsible for
-        passing a valid mode and arguments list to plugin.test().
+        python file (typically in the root directory).
         '''
         self._name = name
         self._filepath = filepath
         self._addon_id = addon_id
-        self._strings_fn = strings_fn
         self._routes = []
         self._view_functions = {}
         self._addon = xbmcaddon.Addon(id=self._addon_id)
