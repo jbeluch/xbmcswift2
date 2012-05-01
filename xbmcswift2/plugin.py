@@ -44,6 +44,14 @@ class Plugin(XBMCMixin):
         self._cache_path = xbmc.translatePath(
             'special://profile/addon_data/%s/.cache/' % self._addon_id)
 
+        # If we are runing in CLI, we need to load the strings.xml manually
+        # TODO: a better way to do this. Perhaps allow a user provided filepath
+        if xbmcswift2.CLI_MODE:
+            from xbmcswift2.mockxbmc import utils
+            utils.load_addon_strings(self._addon,
+                os.path.join(os.path.dirname(self._filepath), 'resources',
+                             'language', 'English', 'strings.xml'))
+
     @property
     def id(self):
         return self._addon_id
