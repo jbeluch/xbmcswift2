@@ -169,15 +169,10 @@ class Plugin(XBMCMixin):
     def redirect(self, url):
         '''Used when you need to redirect to another view, and you only
         have the final plugin:// url.'''
-        pass
-
-
-
-'''
-Plugin - keeps track of views for the plugin and has a property pointing to the current request
-XBMCMixin - a bunch of stateless methods
-
-PluginResponse
+        # TODO: Should we be overriding self.request with the new request?
+        new_request = self._parse_request(url=url, handle=self.request.handle)
+        log.debug('Redirecting %s to %s' % (self.request.path, new_request.path))
+        return self._dispatch(new_request.path)
 
     def run(self):
         '''The main entry point for a plugin.'''
