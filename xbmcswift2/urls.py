@@ -87,7 +87,12 @@ class UrlRule(object):
         # (2) Separate extra items
         # (3) pickle any items not basetring
         # (4) Append query string
-        url_items = dict((key, val) for key, val in items.items()
+
+        # First use our defaults passed when registering the rule
+        url_items = dict((key, val) for key, val in self._options.items()
+                         if key in self._keywords)
+        # Now update with update with any items explicitly passed to url_for
+        url_items.update((key, val) for key, val in items.items()
                          if key in self._keywords)
 
         # Create the path
