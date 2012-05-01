@@ -64,6 +64,28 @@ def pickle_dict(items):
     return ret
 
 
+def unpickle_args(items):
+    '''Takes a dict and unpickles values whose keys are found in
+    '_pickled' key.
+
+    >>> unpickle_args({'_pickled': ['foo']. 'foo': ['I3%0A.']})
+    {'foo': 3}
+    '''
+    # Technically there can be more than one _pickled value. At this point
+    # we'll just use the first one
+    pickled= items.pop('_pickled', None)
+    if pickled is None:
+        return items
+
+    pickled_keys = pickled[0].split(',')
+    ret = {}
+    for key, vals in items.items():
+        if key in pickled_keys:
+            ret[key] = [pickle.loads(val) for val in vals]
+        else:
+            ret[key] = vals
+    return ret
+
 def unpickle_dict(items):
     '''Returns a dict pickled with pickle_dict'''
     pickled_keys = items.pop('_pickled', '').split(',')
