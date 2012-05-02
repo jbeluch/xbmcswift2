@@ -39,6 +39,7 @@ class Plugin(XBMCMixin):
         self._addon = xbmcaddon.Addon(id=self._addon_id)
         self._current_items = []  # Keep track of added list items
         self._request = None  # Initialized when plugin.run() is called
+        self._end_of_directory = False
 
         # set up logger
         self._log = setup_log(addon_id)
@@ -179,6 +180,10 @@ class Plugin(XBMCMixin):
             #      plugin.finish()
             log.info('Request for "%s" matches rule for function "%s"' % (path, view_func.__name__))
             listitems = view_func(**items)
+
+            # Allow the returning of bare dictionaries so we can cache view
+            if not self._end_of_directory:
+                listitems = self.finish(listitems)
             return listitems
         raise NotFoundException, 'No matching view found for %s' % path
 

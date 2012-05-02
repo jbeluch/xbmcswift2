@@ -28,6 +28,7 @@ class XBMCMixin(object):
     _end_of_directory = False
     _memoized_cache = None
     _unsynced_caches = None
+    # TODO: Ensure above is implemented
     '''
     def cache(self, ttl_hours=24):
         '''View caching decorator. Currently must be closest to the
