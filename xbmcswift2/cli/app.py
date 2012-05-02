@@ -43,6 +43,7 @@ def patch_plugin(plugin, path, handle=None):
     if handle is None:
         handle = plugin.request.handle
     plugin._request = Request(path, handle)
+    plugin._end_of_directory = False
 
 def once(plugin, parent_item=None):
     plugin.clear_added_items()
