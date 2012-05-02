@@ -152,9 +152,6 @@ class XBMCMixin(object):
         item = xbmcswift2.ListItem(path=url)
         item.set_played(True)
         xbmcplugin.setResolvedUrl(self.handle, True, item.as_xbmc_listitem())
-
-        if self._mode in DEBUG_MODES:
-            display_video(item)
         return [item]
 
     def play_video(self, item, player=xbmc.PLAYER_CORE_DVDPLAYER):
@@ -162,9 +159,6 @@ class XBMCMixin(object):
             item = xbmcswift2.ListItem.from_dict(**item)
         item.set_played(True)
         xbmc.Player(player).play(item.get_path, item)
-
-        if self._mode in DEBUG_MODES:
-            display_video(item)
         return [item]
 
     def add_items(self, items):

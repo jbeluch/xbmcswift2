@@ -17,31 +17,52 @@ def get_max_len(items):
 
 
 def display_listitems(items):
-    '''Prints a list of items along with the current index'''
-    label_width = get_max_len(item.get_label() for item in items)
-    num_width = len(str(len(items)))
-    output = []
-    for i, item in enumerate(items):
-        output.append('[%s] %s (%s)' % (
-            str(i).rjust(num_width),
-            item.get_label().ljust(label_width),
-            item.get_path()))
+    '''Displays a list of items along with the index to enable a user
+    to select an item.
+    '''
+    if (len(items) == 2 and items[0].get_label() == '..'
+        and items[1].get_played()):
+        display_video(items)
+    else:
+        label_width = get_max_len(item.get_label() for item in items)
+        num_width = len(str(len(items)))
+        output = []
+        for i, item in enumerate(items):
+            output.append('[%s] %s (%s)' % (
+                str(i).rjust(num_width),
+                item.get_label().ljust(label_width),
+                item.get_path()))
 
-    line_width = get_max_len(output)
-    output.append('-' * line_width)
+        line_width = get_max_len(output)
+        output.append('-' * line_width)
 
-    header = [
+        header = [
+            '-' * line_width,
+            '%s %s Path' % ('#'.center(num_width + 2), 'Label'.ljust(label_width)),
+            '-' * line_width,
+        ]
+        print '\n'.join(header + output)
+
+
+def display_video(items):
+    '''Prints a message for a playing video and displays the parent
+    listitem.
+    '''
+    parent_item, played_item = items
+
+    title_line = 'Playing Media %s (%s)' % (played_item.get_label(),
+                                            played_item.get_path())
+    parent_line = '[0] %s (%s)' % (parent_item.get_label(),
+                                   parent_item.get_path())
+    line_width = get_max_len([title_line, parent_line])
+
+    output = [
         '-' * line_width,
-        '%s %s Path' % ('#'.center(num_width + 2), 'Label'.ljust(label_width)),
+        title_line,
         '-' * line_width,
+        parent_line,
     ]
-    print '\n'.join(header + output)
-
-
-def display_video(item):
-    '''Prints a message for playing a video'''
-    print '--'
-    print '[Playing Video] %s' % item
+    print '\n'.join(output)
 
 
 def get_user_choice(items):
