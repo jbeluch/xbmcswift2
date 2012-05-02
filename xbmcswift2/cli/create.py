@@ -114,7 +114,7 @@ def create_new_project():
 
     print \
 '''
-    XBMC Swift - A micro-framework for creating XBMC plugins.
+    xbmcswift2 - A micro-framework for creating XBMC plugins.
     xbmc@jonathanbeluch.com
     --
 '''

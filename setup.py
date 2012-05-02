@@ -21,15 +21,15 @@ setup(
     #package_dir={'xbmcswift': 'xbmcswift'},
     package_data={'xbmcswift2': [
         #skel/
-        'data/addon.xml',
-        'data/addon.py',
+        'cli/data/addon.xml',
+        'cli/data/addon.py',
         #'skel/resources',
         #'skel/resources/lib',
-        'data/resources/lib/__init__.py',
-        'data/resources/__init__.py',
+        'cli/data/resources/lib/__init__.py',
+        'cli/data/resources/__init__.py',
         #'skel/resources/language',
         #'skel/resources/language/English',
-        'data/resources/language/English/strings.xml',
+        'cli/data/resources/language/English/strings.xml',
     ]},
 
     packages=find_packages(),
@@ -45,7 +45,7 @@ setup(
     ],
     entry_points={
        'console_scripts': [
-           'xbmcswift2 = xbmcswift2.create:main',
+           'xbmcswift2 = xbmcswift2.cli.create:main',
        ]
     },
 )
