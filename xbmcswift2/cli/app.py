@@ -17,6 +17,7 @@ from xbmcswift2.common import Modes
 from xbmcswift2.request import Request
 from xbmcswift2.log import log
 from xbmcswift2.cli.console import display_listitems, continue_or_quit, get_user_choice
+from xbmcswift2.listitem import ListItem
 
 def plugin_runner(plugin):
     '''Handles running a plugin from the CLI.'''
@@ -43,9 +44,14 @@ def patch_plugin(plugin, path, handle=None):
         handle = plugin.request.handle
     plugin._request = Request(path, handle)
 
-def once(plugin):
+def once(plugin, parent_item=None):
     plugin.clear_added_items()
     items = plugin._dispatch(plugin.request.path)
+
+    # Prepend the parent_item if given
+    if parent_item is not None:
+        items.insert(0, parent_item)
+
     display_listitems(items)
     return items
 
@@ -53,11 +59,26 @@ def once(plugin):
 # TODO: clear plugin's listitem state
 def interactive(plugin):
     items = [item for item in once(plugin) if not item.get_played()]
+    parent_stack = []  # Keep track of parents so we can have a '..' option
 
     selected_item = get_user_choice(items)
     while selected_item is not None:
+        if parent_stack and selected_item == parent_stack[-1]:
+            # User selected the parent item, remove from list
+            parent_stack.pop()
+        else:
+            # User selected non parent item, add current url to parent stack
+            parent_stack.append(ListItem.from_dict(label='..',
+                                                   path=plugin.request.url))
         patch_plugin(plugin, selected_item.get_path())
-        items = [item for item in once(plugin) if not item.get_played()]
+
+        # If we have parent items, include the top of the stack in the list
+        # item display
+        parent_item = None
+        if parent_stack:
+            parent_item = parent_stack[-1]
+        items = [item for item in once(plugin, parent_item=parent_item)
+                 if not item.get_played()]
         selected_item = get_user_choice(items)
 
 
