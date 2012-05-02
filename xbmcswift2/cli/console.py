@@ -72,7 +72,9 @@ def get_user_choice(items):
     choice = raw_input('Choose an item or "q" to quit: ')
     while choice != 'q':
         try:
-            return items[int(choice)]
+            item = items[int(choice)]
+            print  # Blank line for readability between interactive views
+            return item
         except ValueError:
             # Passed something that cound't be converted with int()
             choice = raw_input('You entered a non-integer. Choice must be an'
