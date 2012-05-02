@@ -120,6 +120,15 @@ class Plugin(XBMCMixin):
         for func in module._register_funcs:
             func(self, url_prefix)
 
+    def cached_route(self, url_rule, name=None, options=None):
+        '''A decorator to add a route to a view and also apply caching.
+        '''
+        route_decorator = self.route(url_rule, name=name, options=options)
+        cache_decorator = self.cache()
+        def new_decorator(func):
+            return route_decorator(cache_decorator(func))
+        return new_decorator
+
     def route(self, url_rule, name=None, options=None):
         '''A decorator to add a route to a view. name is used to
         differentiate when there are multiple routes for a given view.'''
