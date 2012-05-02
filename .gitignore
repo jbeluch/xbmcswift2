@@ -3,9 +3,9 @@ load-dev-env.sh
 *.pyc
 *.swp
 *.swo
-lib/dist/
-lib/build/
-lib/XBMC_Swift.egg-info/
-lib/docs/_build/
+dist/
+build/
+XBMC_Swift.egg-info/
+docs/_build/
 TODO
 XBMC_Swift.egg-info/
