@@ -184,14 +184,14 @@ class Plugin(XBMCMixin):
                 view_func, items = rule.match(path)
             except NotFoundException:
                 continue
-            #return view_func(**items)
-            #TODO: allow returns just dictionaries that will be passed to
-            #      plugin.finish()
             log.info('Request for "%s" matches rule for function "%s"' % (path, view_func.__name__))
             listitems = view_func(**items)
 
+            # TODO: Verify the main UI handle is always 0, this check exists so
+            #       we don't erroneously call endOfDirectory for alternate
+            #       threads
             # Allow the returning of bare dictionaries so we can cache view
-            if not self._end_of_directory:
+            if not self._end_of_directory and self.handle == 0:
                 listitems = self.finish(listitems)
             return listitems
         raise NotFoundException, 'No matching view found for %s' % path

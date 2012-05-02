@@ -148,6 +148,19 @@ class XBMCMixin(object):
         view_mode_id'''
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
 
+    def notify(self, msg='', title=None, delay=5000, image=''):
+        '''Displays a temporary notification message to the user. If
+        title is not provided, the plugin name will be used. To have a
+        blank title, pass '' for the title argument. The delay argument
+        is in milliseconds.
+        '''
+        if not msg:
+            log.warning('Empty message for notification dialog')
+        if title is None:
+            title = self.plugin.name
+        xbmc.executebuiltin('XBMC.Notification("%s", "%s", "%s", "%s")' %
+                            (msg, title, delay, image))
+
     def set_resolved_url(self, url):
         item = xbmcswift2.ListItem(path=url)
         item.set_played(True)
@@ -239,8 +252,7 @@ class XBMCMixin(object):
                 self.set_view_mode(view_mode_id)
 
         # Finalize the directory items
-        xbmcplugin.endOfDirectory(self.handle, succeeded,
-                                  update_listing, cache_to_disc)
+        self.end_of_directory(succeeded, update_listing, cache_to_disc)
 
         # Close any open caches which will persist them to disk
         if hasattr(self, '_unsynced_caches'):
