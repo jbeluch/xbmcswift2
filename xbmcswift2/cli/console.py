@@ -11,11 +11,31 @@ from optparse import OptionParser
 from xbmcswift2.common import Modes
 
 
+def get_max_len(items):
+    '''Returns the max of the lengths for the provided items'''
+    return max(len(item) for item in items)
+
+
 def display_listitems(items):
     '''Prints a list of items along with the current index'''
-    print '--'
+    label_width = get_max_len(item.get_label() for item in items)
+    num_width = len(str(len(items)))
+    output = []
     for i, item in enumerate(items):
-        print '[%d] %s' % (i, item)
+        output.append('[%s] %s (%s)' % (
+            str(i).rjust(num_width),
+            item.get_label().ljust(label_width),
+            item.get_path()))
+
+    line_width = get_max_len(output)
+    output.append('-' * line_width)
+
+    header = [
+        '-' * line_width,
+        '%s %s Path' % ('#'.center(num_width + 2), 'Label'.ljust(label_width)),
+        '-' * line_width,
+    ]
+    print '\n'.join(header + output)
 
 
 def display_video(item):
