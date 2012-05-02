@@ -3,7 +3,7 @@
 Installation
 ============
 
-The quickest (and best) option for installing xbmcswift depends on Python 2.5
+The quickest (and best) option for installing xbmcswift2 depends on Python 2.5
 or higher and virtualenv.
 
 virtualenv
@@ -33,17 +33,17 @@ Creating a Virtual Environment
 
 Now we can create our virtualenv::
 
-    $ mkvirtualenv xbmcswift
+    $ mkvirtualenv xbmcswift2
 
-When this completes, your prompt should now be preceded by `(xbmcswift)`.
-Now we install xbmcswift::
+When this completes, your prompt should now be preceded by `(xbmcswift2)`.
+Now we install xbmcswift2::
 
-    $ pip install xbmcswift
+    $ pip install xbmcswift2
 
 Everything should be good to go. When you would like to work on your project
 again, simply::
 
-    $ workon xbmcswift
+    $ workon xbmcswift2
 
 and to deactive the virtualenv::
 

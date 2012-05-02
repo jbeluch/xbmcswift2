@@ -3,31 +3,34 @@
 Quickstart
 ============
 
-If you haven't already installed xbmcswift, head over to the `installation`
+If you haven't already installed xbmcswift2, head over to the `installation`
 page.
 
-The purpose of xbmcswift is to enable rapid plugin creation. This is faciliated
-by:
+The purpose of xbmcswift2 is to empower plugin writers to develop and debug
+their plugins faster. This is faciliated by:
 
 * A bootstrap script to create an empty addon complete with folder structure
   and required files.
 
 * Seamless testing of addons by enabling an addon to be run on the command line
-  or in XBMC. xbmcswift handles mocking the xbmc python modules to ensure your
-  addon will run (in a limited fashion) outside of XBMC>
+  or in XBMC. xbmcswift2 handles mocking the xbmc python modules to ensure your
+  addon will run (in a limited fashion) outside of XBMC *without* any code
+  changes.
 
 * Basic URL routing code, so you can focus on writing the web parsing code
-  specific to your plugin, and not deal with repeated boilerplate.
+  specific to your plugin, and not deal with repeated boilerplate and url
+  parsing.
 
-* A library of helpful functions and code patterns to enchance your addon's
+* A library of helpful functions and code patterns to enhance your addon's
   functionality.
 
-Intro to XBMC addons
---------------------
+
+Introduction to XBMC Addons
+---------------------------
 
 Before going any further, you should already be familiar with the general file
-structure and necessary files for an XBMC addon. If not, please spend a few minutes
-reading about addons in the wiki_.
+structure and necessary files for an XBMC addon. If not, please spend a few
+minutes reading about addons in the XBMC wiki_.
 
 .. _wiki: http://wiki.xbmc.org/index.php?title=Add-on_development
 
@@ -35,26 +38,26 @@ reading about addons in the wiki_.
 Creating the Plugin Skeleton
 ----------------------------
 
-xbmcswift comes with a helpful console script that will create a plugin
+xbmcswift2 comes with a helpful console script that will create a plugin
 skeleton for you, including all the necessary folders and files to get started.
-Simply run `xbmcswift create` and answer a few questions to personalize your
+Simply run `xbmcswift2 create` and answer a few questions to personalize your
 addon.
 
 Below is an example session::
 
-    $ xbmcswift create
+    $ xbmcswift2 create
 
-        XBMC Swift - A micro-framework for creating XBMC plugins.
+        xbmcswift2 - A micro-framework for creating XBMC plugins.
         xbmc@jonathanbeluch.com
         --
 
-        I'm going to ask you a few questions to get this project started.
-        What is your plugin name? : Hello XBMC
-        Enter your plugin id. [plugin.video.helloxbmc]: 
-        Enter parent folder (where to create project) [/tmp]: 
-        Enter provider name : Jonathan Beluch (jbel)
-        Projects successfully created in /tmp/plugin.video.helloxbmc.
-        Done.
+    I'm going to ask you a few questions to get this project started.
+    What is your plugin name? : Hello XBMC
+    Enter your plugin id. [plugin.video.helloxbmc]:
+    Enter parent folder (where to create project) [/private/tmp]: 
+    Enter provider name : Jonathan Beluch (jbel)
+    Projects successfully created in /private/tmp/plugin.video.helloxbmc.
+    Done.
 
 
 Hello XBMC
@@ -66,7 +69,7 @@ find an ``addon.py`` exactly like the one below.
 .. sourcecode:: python
 
     #!/usr/bin/env python
-    from xbmcswift import Plugin
+    from xbmcswift2 import Plugin
 
     PLUGIN_NAME = 'Hello XBMC'
     PLUGIN_ID = 'plugin.video.helloxbmc'
@@ -76,7 +79,7 @@ find an ``addon.py`` exactly like the one below.
     @plugin.route('/')
     def index():
         item = {'label': 'Hello XBMC!'}
-        return plugin.finish([item])
+        return [item]
 
     if __name__ == '__main__':
         plugin.run()
@@ -85,72 +88,54 @@ The above code is a fully functioning XBMC addon (not that it does much!). So
 what does the code do?
 
 1. After importing the Plugin class, we create our plugin instance. The
-   arguments are, ``Addon Name``, ``addon id`` (ids should be according to
-   XBMC's documentation <http://here>). The third argument is the actual file,
-   which xbmcswift uses for some functionality behind the scenes.
+   arguments are, ``addon name``, ``addon id`` (ids should be according to
+   XBMC's documentation <http://here>). The third argument is the actual
+   filepath, which xbmcswift2 uses for some functionality behind the scenes.
 
-2. We are using the ``plugin.route`` decorator on the ``index`` function. We
-   are binding a url path of '/' to the index function. ('/' is the default URL
+2. We are using the ``plugin.route`` decorator on the ``index`` function. This
+   binds a url path of '/' to the index function. ('/' is the default URL
    path).
 
-3. The index function creates a dictionary with a single key/val pair,
-   ``label``. :meth:`~shityeah </xbmcswift.Plugin.finish>` expects a list, so we wrap our item in square
-   brackets. Note the use of the return statement. In order for xbmcswift to
-   function properly, each view must return ListItems (more on this later).
+   Note: The url rule of '/' must always exist in a plugin. This is the default
+   route when a plugin is first run.
 
-4. We simply call ``plugin.run()``.
+3. The index function creates a dictionary with a single key/val pair,
+   ``label``. In the simplest form of a plugin, we can just return a list of
+   dictionaries containg the values to be translated to list items. Note that
+   for xbmcswift2 to function properly, we must always return a list of items.
+
+4. We call ``plugin.run()`` to run our plugin.
 
 
 Running Addons from the Command Line
 ------------------------------------
 
-One of the shining points of XBMC is the ability to run plugins from the
+One of the shining points of xbmcswift2 is the ability to run plugins from the
 command line. To do so, simply run addon.py like you would any other python
 file::
 
-    $ python addon.py
-    --
+    $ python addon.py 
+    2012-05-02 19:02:37,785 - DEBUG - [xbmcswift2] Adding url rule "/" named "index" pointing to function "index"
+    2012-05-02 19:02:37,798 - DEBUG - [xbmcswift2] Dispatching / to once
+    2012-05-02 19:02:37,798 - INFO - [xbmcswift2] Request for "/" matches rule for function "index"
+    ----------------------
+     #  Label       Path
+    ----------------------
     [0] Hello XBMC! (None)
+    ----------------------
 
-The line with ``[0]`` corresponds to our added list item. Since our addon is
-pretty simple, there is only one listitem available. A more complicated addon
-might have output like this::
-
-    $ python addon.py
-    --
-    [1] Subjects (special://plugin.video.academicearth/subjects/)
-    [2] Universities (special://plugin.video.academicearth/universities/)
-    [3] Instructors (special://plugin.video.academicearth/instructors/)
-
-Here we can see the item number in square brackets, the label next, and the
-path for the list item in parentheses.
-
-There are 3 run modes available when running from the CLI, ``once``,
-``interactive`` and ``crawl``. You can run ``python addon.py -h`` if you need
-to refresh.
-
-``once`` is the default mode, the one we ran above. If we run with
-``interactive``, we'll be able to step through our addon by selecting items
-from the list::
-
-    $ python addon.py interactive
-    --
-    [0] Hello XBMC! (None)
-    Choose an item or "q" to quit:
-
-Note, that since we don't have an associated path for the list item, we'll get
-an error if we choose 0.
-
-See <http://this.link.> to read more about options when running from the command line.
+Right away we can see the output of our plugin. When running in the CLI,
+xbmcswift2 prints log messages to STDERR. Below the logs we can see a simple
+display of our listitems, in this case a single item.
 
 
-Url Routing
+URL Routing
 -----------
 
-One of the advantages of using xbmcswift, is its clean URL routing code. This
+One of the advantages of using xbmcswift2, is its clean URL routing code. This
 means you don't have to write your own code to parse the URL provided by XBMC
-and route it to a specific piece of code. xbmcswift uses a a path passed to the
-:meth:`~xbmcswift.Plugin.route` decorator to bind a URL to a function. For
+and route it to a specific function. xbmcswift2 uses a a path passed to the
+:meth:`~xbmcswift2.Plugin.route` decorator to bind a URL to a function. For
 example, a route of ``/videos/`` will result in a URL of
 ``plugin://plugin.video.helloxbmc/videos/`` to call the decorated function.
 
@@ -161,11 +146,13 @@ have a function like this to list videos for a given category:
 
     @plugin.route('/categories/<category>/')
     def show_videos(category):
-        # Get videos for the provided category
+        '''Display videos for the provided category'''
+        # An incoming URL of /categories/science/ would call this function and
+        # category would have a value of 'science'.
         items = get_video_items(category)
         return plugin.finish(items)
 
-Currently, there is no type coersion, so all variables plucked from URLs will
+Currently, there is no type coercion, so all variables plucked from URLs will
 be strings.
 
 Now we have a way of directing incoming URLs to specific views. But how do we
@@ -179,7 +166,7 @@ link list items to other views in our code? We'll modify our Hello XBMC addon:
             {'label': 'Hola XBMC!', 'path': plugin.url_for('show_label', label='spanish')},
             {'label': 'Bonjour XBMC!', 'path': plugin.url_for('show_label', label='french')},
         ]
-        return plugin.finish(items)
+        return items
 
 
     @plugin.route('/labels/<label>/')
@@ -189,9 +176,31 @@ link list items to other views in our code? We'll modify our Hello XBMC addon:
         items = [
             {'label': label},
         ]
-        return plugin.finish(items)
+        return items
 
 Let's run our plugin interactively now to explore::
+
+    $ ./addon.py interactive
+    2012-05-02 19:14:53,792 - DEBUG - [xbmcswift2] Adding url rule "/" named "index" pointing to function "index"
+    2012-05-02 19:14:53,792 - DEBUG - [xbmcswift2] Adding url rule "/labels/<label>/" named "show_label" pointing to function "show_label"
+    2012-05-02 19:14:53,793 - DEBUG - [xbmcswift2] Dispatching / to interactive
+    2012-05-02 19:14:53,794 - INFO - [xbmcswift2] Request for "/" matches rule for function "index"
+    -------------------------------------------------------------------
+     #  Label         Path
+    -------------------------------------------------------------------
+    [0] Hola XBMC!    (plugin://plugin.video.helloxbmc/labels/spanish/)
+    [1] Bonjour XBMC! (plugin://plugin.video.helloxbmc/labels/french/)
+    -------------------------------------------------------------------
+    Choose an item or "q" to quit: 0
+
+    2012-05-02 19:14:59,854 - INFO - [xbmcswift2] Request for "/labels/spanish/" matches rule for function "show_label"
+    ----------------------------------------------
+    #  Label   Path
+    ----------------------------------------------
+    [0] ..      (plugin://plugin.video.helloxbmc/)
+    [1] spanish (None)
+    ----------------------------------------------
+    Choose an item or "q" to quit: q
 
     $ python addon.py interactive
     --
@@ -201,10 +210,24 @@ Let's run our plugin interactively now to explore::
     --
     [0] spanish (None)
 
-Going back to our modified code, we are calling ``plugin.url_for`` to get the
-URL for a specific view. The first and only required argument is the name of
-our target function. If the function takes arguments, then we must pass keyword
-arguments with the same variable names, hence ``label='spanish'``.
+We've introduced a few new topics here.
+
+* We passed a ``interactive`` as a positional argument to xbmcswift2. This
+  enables us to interact with the list items rather than just print them once
+  and exit.
+
+* We've used :meth:`~xbmcswift2.Plugin.url_for` to create a url pointing to a
+  different view function. This is how view functions create list items that
+  link to other functions.
+
+* Our function ``show_label`` requires an argument 'label', so we pass a
+  keyword argument with the same name to url_for.
+
+* To set the url for a list item, we set the 'path' keyword in the item
+  dictionary.
+
+* xbmcswift2 display a list item of '..', which is simliar to XBMC's '..' list
+  item. This enables you to go back to the parent directory.
 
 To learn more about URL routing and other available options, check out the <API>
 or the <patterns page>.
@@ -214,9 +237,10 @@ Playing Media
 -------------
 
 The last thing we haven't covered is how to play an actual video. By default,
-all items passed to plugin.finish are directory list items. This means that
-their associated paths will call back into the addon. To differentiate playable
-items, we'll set ``is_playable`` to ``True`` in our item dictionary.
+all items returned are directory items. This means that they act as a directory
+for more list items, and its URL points back into the plugin. To differentiate
+playable media from directory items, we set ``is_playable`` to ``True`` in our
+item dictionary.
 
 First, let's add a new view to play some media:
 
@@ -252,13 +276,13 @@ Using xbmc, xbmcgui, xbmcaddon
 ------------------------------
 
 You can always import and call any of the xbmc modules directly if you need
-advanced functionality that xbmcswift doesn't support. However, if you still
-want to be able run plugins from the command line you should import the xbmc
-modules from xbmcswift, e.g.
+advanced functionality that xbmcswift2 doesn't support. However, if you still
+want the ability to run plugins from the command line you should import the
+xbmc modules from xbmcswift2.
 
 .. sourcecode:: python
 
-   from xbmcswift import xbmc, xbmcgui
+   from xbmcswift2 import xbmc, xbmcgui
 
 Since these modules are written in C, they are only available when running
 XBMC. To make plugins run on the command line, XBMC has mock versions of these
