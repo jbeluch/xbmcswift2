@@ -5,6 +5,66 @@ Patterns
 ========
 
 
+Caching
+-------
+
+View Caching
+````````````
+
+Use the :meth:`~xbmcswift2.Plugin.cached_route` decorator instead of the normal
+`route` decorator. This will cache the results of your view for 24 hours.
+
+*NOTE:* You must be returning a list of plain dictionaries from your view and
+cannot return plugin.finish(). This is due to a current limitation in the cache
+which doesn't keep track of side effects such as a call to plugin.finish. If
+you need to call plugin.finish() because you are passing non-default arguments,
+then see the next example which uses plugin.cache().
+
+.. sourcecode:: python
+
+    @plugin.cached_route('/subjects/', options={'url': full_url('subjects')})
+    def show_subjects(url):
+        '''Lists available subjects found on the website'''
+        html = htmlify(url)
+        subjects = html.findAll('a', {'class': 'subj-links'})
+
+        items = [{
+            'label': subject.div.string.strip(),
+            'path': plugin.url_for('show_topics', url=full_url(subject['href'])),
+        } for subject in subjects]
+        return items
+
+General Function Caching
+````````````````````````
+
+To cache the results of any function call, simply use the
+:meth:`~xbmcswift2.Plugin.cache` decorator. Keep in mind that the function name
+along with the args and kwargs used to call the function are used as the cache
+key. If your function depends on any variables in outer scope which could
+affect the return value, you should pass in those variables explictly as args
+to ensure a different cache entry is created.
+
+.. sourcecode:: python
+
+    @plugin.cache()
+    def get_api_data():
+        return download_data()
+
+Storing Arbitrary Objects
+`````````````````````````
+
+You can always create your own cache using :meth:`~xbmcswift2.Plugin.get_cache`
+or :meth:`~xbmcswift2.Plugin.get_timed_cache`. The returned cache acts like a
+dictionary, however it is automatically persisted to disk.
+
+.. sourcecode:: python
+
+    cache = plugin.get_cache('people')
+    cache['jon'] = {'vehicle': 'bike'}
+    cache['dave']      # Throws KeyError
+    cache.get('dave')  # Returns None
+    cache.clear()      # Clears all items from the cache
+
 Adding pagination
 -----------------
 
