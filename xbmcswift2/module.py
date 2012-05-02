@@ -8,6 +8,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from xbmcmixin import XBMCMixin
+from xbmcswift2.log import setup_log
 
 
 class Module(XBMCMixin):
@@ -23,6 +24,8 @@ class Module(XBMCMixin):
         self._register_funcs = []
         self._plugin = None
         self._url_prefix = None
+        # TODO: Think of a better log name
+        self._log = setup_log(namespace)
 
     # TODO: add setter for plugin during registration
     @property
@@ -60,6 +63,11 @@ class Module(XBMCMixin):
     def request(self):
         '''Returns the current request'''
         return self.plugin.request
+
+    @property
+    def log(self):
+        '''Returns the registered plugin's log.'''
+        return self._log
 
     @property
     def url_prefix(self):
