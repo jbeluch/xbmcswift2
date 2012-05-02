@@ -1,9 +1,12 @@
 import os
+from xbmcswift2.log import log
+
 
 class Addon(object):
     def __init__(self, id):
         self._id = id
         self._strings = {}
+        self._settings = {}
 
     def getAddonInfo(self, id):
         properties = ['author', 'changelog', 'description', 'disclaimer',
@@ -18,11 +21,17 @@ class Addon(object):
         return self._strings[key]
 
     def getSetting(self, id):
-        raise NotImplementedError, 'Not ready yet!'
+        try:
+            value = self._settings[id]
+        except KeyError:
+            log.warning('xbmcaddon.Addon.getSetting() has not been implemented'
+                        ' in CLI mode.')
+            value = raw_input('* Please enter a temporary value for %s: ' % id)
+            self._settings[id] = value
+        return value
 
     def setSetting(self, id, value):
-        raise NotImplementedError, 'Not ready yet!'
+        self._settings[id] = value
 
     def openSettings(self):
         pass
-
