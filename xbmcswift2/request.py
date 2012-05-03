@@ -7,12 +7,21 @@ except ImportError:
 
 
 class Request(object):
-    # TODO: no need for a class, use NamedTuple instead
+    '''The request objects contains all the arguments passed to the plugin via
+    the command line.
+
+    :param url: The complete plugin URL being requested. Since XBMC typically
+                passes the URL query string in a separate argument from the
+                base URL, they must be joined into a single string before being
+                provided.
+    :param handle: The handle for the current plugin.
+    '''
 
     def __init__(self, url, handle):
-        # TODO: combine argv0 and argtv1 then use urlparse to get the query
-        # string before passing to parse_qs
+        #: The entire request url.
         self.url = url
+
+        #: The current request's handle, an integer.
         self.handle = int(handle)
 
         # urlparse doesn't like the 'plugin' scheme, so pass a protocol
