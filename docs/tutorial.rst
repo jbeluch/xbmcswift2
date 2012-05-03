@@ -3,120 +3,199 @@
 Tutorial
 ========
 
-Intial views
-------------
+At the end of this tutorial we're going to have a basic version of the Academic
+Earth Plugin. The web page we're going to be parsing is
+http://www.academicearth.org/.
 
 
-Using the strings file
-----------------------
-
-
-Check dependencies in addon.xml
--------------------------------
-
-
-Basic xbmcswift views
---------------------------
-
-XBMC addons typically add items to the screen using xbmc.addDirectoryItem.
-These are items are either folders (a non-playable item which calls back into
-the addon) or they are playable items which have an associated path to a media
-file.
-
-
-Adding non-playable list items
-``````````````````````````````
-
-The easiest way to add items using xbmcswift is to call the
-:meth:`~xbmcswift.Plugin.finish` method on your plugin instance.  This method
-takes a list of items as its first argument. The list of items can either be
-instances of :class:`xbmcswift.ListItem` or dictionaries. If they are
-dictionaries, the keys correspond to the arguments to the static method
-:meth:`~xbmcswift.ListItem.from_dict`.
-
-.. sourcecode:: python
-
-    @plugin.route('/')
-    def index():
-        items = [
-            {'label': 'Item One'},
-            {'label': 'Item Two'},
-        ]
-        return plugin.finish(items)
-
-Note, that we are returning the result of plugin.finish(). This enables us to
-use all the helpful features of xbmcswift, like testing from the CLI.  The
-above code will render two list items in XBMC. (Note that this example is not
-complete since the items don't have a path associated with them, you would get
-an error in XBMC if you clicked on one of them.
-
-Adding playable list items
-``````````````````````````
-
-To add playable list items, simply set ``is_playable`` to ``True`` in the item
-dict.
-
-.. sourcecode:: python
-
-    @plugin.route('/videos/')
-    def show_videos():
-        items = [
-            {'label': 'Calculus: Derivatives 1',
-             'path': 'http://s3.amazonaws.com/KA-youtube-converted/ANyVpMS3HL4.mp4/ANyVpMS3HL4.mp4',
-             'is_playable': True,
-             }
-        ]
-        return plugin.finish(items)
-    
-The above code will add a single list item to XBMC, which when selected will
-play the specified video.
-
-
-Initial Menu
-------------
-
-Typically most plugins will have an initial menu of hard-coded choices, so
-we'll go ahead and do that.
-
-We'll use the default view created in the skeleton, the view with route '/':
-
-.. sourcecode:: python
-
-    return plugin.add_items('asdfasdf')
-
-Links to Other Views
---------------------
-
-more text
-asdf
-
-Running from the command-line
+Creating the Plugin Structure
 -----------------------------
 
-howh ot run from CLI
+You can either do this part manually, or use the ``xbmcswift2 create`` script.
+We'll do the latter.::
 
-Providing a specific url
-````````````````````````
-how to provide url
+    (xbmcswift2)jon@lenovo tmp  $ xbmcswift2 create
 
-Run modes
-`````````
-different run modes, interactive, once, <test> link to testing patterns
+        xbmcswift2 - A micro-framework for creating XBMC plugins.
+        xbmc@jonathanbeluch.com
+        --
 
-Returning from Views
+        I'm going to ask you a few questions to get this project started.
+        What is your plugin name? : Academic Earth Tutorial
+        Enter your plugin id. [plugin.video.academicearthtutorial]: 
+        Enter parent folder (where to create project) [/tmp]: 
+        Enter provider name : Jonathan Beluch (jbel)
+        Projects successfully created in /tmp/plugin.video.academicearthtutorial.
+        Done.
+
+If we were to run the plugin from the CLI now, we'd see a single list item.
+
+
+Main Menu
+---------
+
+Let's modify the the index function, to look like below.
+
+.. sourcecode:: python
+
+   @plugin.route('/')
+   def main_menu():
+    items = [
+        {'label': 'Show Subjects', 'path': plugin.url_for('show_subjects')}
+    ]
+    return items
+
+The ``main_menu`` function is going to be our default view. To keep the
+tutorial simple, we are only going to take one path through the website. 
+
+If you were to run the plugin now, you'd see an exception about a view not
+being found. This is because we are specifying a view name of 'show_subjects'
+but we don't have a view with that name! So let's create a stub for that view.
+
+.. sourcecode:: python
+
+    @plugin.route('/subjects/')
+    def show_subjects():
+        pass
+
+So now we have a basic plugin with two views. Keep in mind as we go along, that
+we can always run the plugin from the command line. If we pass the interactive
+argument (``python addon.py interactive``) we can explore the view hierarchies.
+
+
+HTML Parsing
+------------
+
+So now we're ready for some HTML parsing. Specifically, we want to parse the
+available subject names and urls from http://www.academicearth.org/subjects/.
+
+When parsing HTML, you can use any library you like. My personal preference is
+to use `Beautiful Soup`_ so we'll be using that for this tutorial.
+
+.. _Beautiful Soup: http://www.crummy.com/software/BeautifulSoup/
+
+We're first going to create a function that will take a URL and return a
+BeautifulSoup object. This will save us some code later as we'll reuse it a
+lot. Don't forget to add the imports to the top of your addon.py file.
+
+.. sourcecode:: python
+
+    from xbmcswift2 import download_page
+    from BeautifulSoup import BeautifulSoup as BS
+
+    def hmtlify(url): 
+        return BS(download_page(url))
+
+We're also going to create another helper function to return a full URL for the
+academic earth website.
+
+.. sourcecode:: python
+    from urlparse import urljoin
+
+    BASE_URL = 'http://academicearth.org'
+    def full_url(path):
+        '''Creates a full academicearth.org url from a relative path'''
+        return urljoin(BASE_URL, path)
+
+Now we can finally parse some HTML. In our ``show_subjects`` view, we're going
+to add some code.
+
+.. sourcecode:: python
+
+    @plugin.route('/subjects/')
+    def show_subjects():
+        html = htmlify(full_url('subjects'))
+        subjects = html.findAll('a', {'class': 'subj-links'})
+
+        items = [{
+            'label': subject.div.string.strip(),
+            'path': plugin.url_for('show_topics', url=full_url(subject['href'])),
+        } for subject in subjects]
+
+        return items
+
+Now just one more step before we attempt to view our work so far. We are now
+referencing a new view, ``show_topics``. Let's create it since it doesn't
+already exist.
+
+.. sourcecode:: python
+
+    @plugin.route('/topics/<url>/')
+    def show_topics(url):
+        pass
+
+You can see that we're now passing arguments between view functions. If you
+follow a link for a subject, you will be presented with a page that contains
+topics. Since XBMC plugins are stateless, we need to pass some argument that
+allows the plugin to identify which subject the user chose. In this case, we'll
+simply pass the URL for the selected subject page.
+
+Viewing Our Progress
 --------------------
 
-Returns directoires
-```````````````````
+Let's take for granted that our code works and attempt to view the plugin
+interactively. Run ``python addon.py interactive`` and explore the plugin. You
+should see the available subjects listed. Notice that the path for each list
+item is slightly different as it contains the URL for that specific subject.
 
-Returning ListItems
-```````````````````
+Sometimes when testing from the CLI, it can be tedious to step all the way
+through the menus. If you'd like to start from a particular menu, simply pass
+in the plugin url as an argument.::
 
-Returning using set_resolved_url
-````````````````````````````````
+    # Display the subjects page
+    $ python addon.py plugin://plugin.video.academicearthtutorial/subjects/
+
+    # Start from the subjects page in interactive mode
+    $ python addon.py interactive plugin://plugin.video.academicearthtutorial/subjects/
 
 
-Running from XBMC
------------------
-how to run new plugin in xbmc
-use symlinks?
+Parsing Topics From a Subject Page
+----------------------------------
+
+Now let's update the show_topics function with some parsing code.
+
+.. sourcecode:: python
+
+    @plugin.route('/topics/<url>/')
+    def show_topics(url):
+        '''Displays topics available for a given subject. If there is only
+        one topic available, the user will be redirected to the topics view
+        instead.
+        '''
+        html = htmlify(url)
+        topics = html.findAll('a', {'class': 'tab-details-link '})
+
+        items = [{
+            'label': topic.string,
+            'path': plugin.url_for('show_courses', url=full_url(topic['href'])),
+        } for topic in topics]
+
+        # If we only have one item, just redirect to the show_topics page,
+        # there's no need to display a single item in the list
+        if len(items) == 1:
+            return plugin.redirect(items[0]['path'])
+        return items
+
+This function should look very similar to the show_subjects function we wrote
+above. The main difference is that we are using a dynamic url being passed in
+as an argument to our function.
+
+We're also being exposed to some new functionality
+:meth:`~xbmcswift2.Plugin.redirect`. This function allows us to redirect the
+user to another view. In this case, if we have only one topic to display, we
+might as well just redirect to `show_courses` for that particular topic.
+
+Like above, we'll need to stub out ``show_courses`` before we can run our
+plugin.
+
+.. sourcecode:: python
+
+    @plugin.route('/courses/<url>/')
+    def show_courses(url):
+        pass
+
+As always, we should test our plugin iteractively to make sure things seem to
+be working.
+
+To be continued...
+

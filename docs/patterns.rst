@@ -81,15 +81,14 @@ for the name keyword argument. When calling ``url_for``, you pass this
 specified name instead of the name of the actual function.
 
 If the decorated method requires arguments, it is possible to pass these as
-extra keyword arguments to the ``route`` decorator if they don't need to be
-dynamically pulled from the URL. Also, the function itself can use python's
-default argument syntax.
+default keyword arguments to the ``route`` decorator. Also, the function itself
+can use python's default argument syntax.
 
 .. sourcecode:: python
 
     @plugin.route('/movies/', name='show_movie_genres')
-    @plugin.route('/silents/', name='show_silent_genres', path='index.php/silent-films-menu')
-    @plugin.route('/serials/', name='show_serials', path='index.php/serials')
+    @plugin.route('/silents/', name='show_silent_genres', {'path': 'index.php/silent-films-menu'})
+    @plugin.route('/serials/', name='show_serials', {'path': 'index.php/serials'})
     def show_genres(path='movies'):
         pass
 
@@ -143,15 +142,21 @@ When calling :meth:`xbmcswift.Plugin.url_for`, any keyword arguments passed
 that are not required for the specified view function will be added as query
 string arguments.
 
-Query string parameters can be accessed from ``plugin.request.args``.
+A dict of query string parameters can be accessed from ``plugin.request.args``.
 
 Any arguments that are not instances of basestring will attempt to be preserved
 by pickling them before being encoded into the query string. This functionality
-isn't fully tested however, and XBMC does finitely limit the length of URLs.
+isn't fully tested however, and XBMC does finitely limit the length of URLs. If
+you need to preserve python objects between function calls, see the Caching_
+patterns.
 
 
-Using the plugin structure
---------------------------
+Using Modules
+-------------
+
+Modules are meant to be mini-plugins. They have some basic functionality that
+is separate from the main plugin. In order to be used, they must be registered
+with a plugin.
 
 Creating an add to favorites plugin:
 
