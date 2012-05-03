@@ -22,12 +22,6 @@ Module
     :members:
     :inherited-members:
 
-XBMCMixin Object
--------------
-
-.. autoclass:: XBMCMixin
-    :members:
-    :inherited-members:
 
 ListItem
 --------
