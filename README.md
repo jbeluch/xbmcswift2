@@ -13,6 +13,11 @@ A micro framework to enable rapid development of XBMC plugins.
   complicated URLs and query strings.
 
 
+## Documentation
+
+The current documentation can be found at
+http://readthedocs.org/docs/xbmcswift2/en/latest/
+
 ## Development
 
 This project is under heavy development. This project is the next version of
