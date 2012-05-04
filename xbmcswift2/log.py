@@ -9,7 +9,6 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 import logging
-from xbmcswift2 import xbmc
 from xbmcswift2 import CLI_MODE
 
 
@@ -56,16 +55,20 @@ class XBMCFilter(object):
         When running inside XBMC it calls the xbmc.log() method and prevents
         the message from being double printed to STDOUT.
         '''
-        xbmc_level = XBMCFilter.xbmc_levels.get(
-            XBMCFilter.python_to_xbmc.get(record.levelname))
-        xbmc.log('%s%s' % (self.prefix, record.msg), xbmc_level)
 
         # When running in XBMC, any logged statements will be double printed
         # since we are calling xbmc.log() explicitly. Therefore we return False
         # so every log message is filtered out and not printed again.
         if CLI_MODE:
             return True
-        return False
+        else:
+            # Must not be imported until here because of import order issues
+            # when running in CLI
+            from xbmcswift2 import xbmc
+            xbmc_level = XBMCFilter.xbmc_levels.get(
+                XBMCFilter.python_to_xbmc.get(record.levelname))
+            xbmc.log('%s%s' % (self.prefix, record.msg), xbmc_level)
+            return False
 
 
 def setup_log(name):
