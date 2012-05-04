@@ -71,6 +71,9 @@ class XBMCFilter(object):
             return False
 
 
+GLOBAL_LOG_LEVEL = logging.DEBUG
+
+
 def setup_log(name):
     '''Returns a logging instance for the provided name. The returned
     object is an instance of logging.Logger. Logged messages will be
@@ -78,9 +81,9 @@ def setup_log(name):
     log when running in XBMC mode.
     '''
     _log = logging.getLogger(name)
-    _log.setLevel(logging.DEBUG)
+    _log.setLevel(GLOBAL_LOG_LEVEL)
     handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
+    handler.setLevel(GLOBAL_LOG_LEVEL)
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)s - [%(name)s] %(message)s')
     handler.setFormatter(formatter)

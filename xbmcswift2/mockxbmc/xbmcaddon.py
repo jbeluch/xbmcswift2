@@ -1,5 +1,5 @@
 import os
-from xbmcswift2.log import log
+from xbmcswift2 import log
 
 
 class Addon(object):

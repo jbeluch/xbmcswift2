@@ -8,7 +8,7 @@ from functools import wraps
 import xbmcswift2
 from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
 from xbmcswift2.cache import Cache, TimedCache
-from xbmcswift2.log import log
+from xbmcswift2 import log
 from xbmcswift2.constants import VIEW_MODES
 from common import Modes, DEBUG_MODES
 from request import Request

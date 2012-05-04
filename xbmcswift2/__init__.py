@@ -49,7 +49,7 @@ except ImportError:
     CLI_MODE = True
 
     import sys
-    from log import log
+    from logger import log
 
     # Mock the XBMC modules
     from mockxbmc import xbmc, xbmcgui, xbmcplugin, xbmcaddon
@@ -66,7 +66,7 @@ from xbmcswift2.common import (xbmc_url, enum, clean_dict, pickle_dict,
     unpickle_args, unpickle_dict, download_page, unhex)
 from xbmcswift2.constants import SortMethod, VIEW_MODES
 from xbmcswift2.listitem import ListItem
-from xbmcswift2.log import setup_log
+from xbmcswift2.logger import setup_log
 from xbmcswift2.module import Module
 from xbmcswift2.urls import AmbiguousUrlException, NotFoundException, UrlRule
 from xbmcswift2.xbmcmixin import XBMCMixin

@@ -8,7 +8,7 @@
     :license: GPLv3, see LICENSE for more details.
 '''
 from xbmcmixin import XBMCMixin
-from xbmcswift2.log import setup_log
+from xbmcswift2 import setup_log
 
 
 class Module(XBMCMixin):

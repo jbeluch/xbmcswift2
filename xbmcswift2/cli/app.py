@@ -15,7 +15,7 @@ import sys
 from optparse import OptionParser
 from xbmcswift2.common import Modes
 from xbmcswift2.request import Request
-from xbmcswift2.log import log
+from xbmcswift2 import logger
 from xbmcswift2.cli.console import display_listitems, continue_or_quit, get_user_choice
 from xbmcswift2.listitem import ListItem
 

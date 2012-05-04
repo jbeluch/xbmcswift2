@@ -11,12 +11,11 @@ except ImportError:
     from cgi import parse_qs
 
 from listitem import ListItem
-from log import log
+from logger import log, setup_log
 from common import enum
 from common import clean_dict
 from urls import UrlRule, NotFoundException, AmbiguousUrlException
 from xbmcswift2 import (xbmc, xbmcgui, xbmcplugin, xbmcaddon, Request,)
-from xbmcswift2.log import setup_log
 
 from xbmcmixin import XBMCMixin
 from common import Modes, DEBUG_MODES

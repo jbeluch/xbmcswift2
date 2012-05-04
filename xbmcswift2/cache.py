@@ -15,7 +15,7 @@ import pickle
 import shutil
 import collections
 from datetime import datetime
-from xbmcswift2.log import log
+from xbmcswift2 import log
 
 
 class PersistentDictMixin(object):
