@@ -75,7 +75,10 @@ def _TestPluginRunner(plugin):
     def run(relative_url, handle=0, qs='?'):
         url = 'plugin://%s%s' % (plugin.id, relative_url)
         sys.argv = [url, handle, qs]
-        return plugin.run()
+        items =  plugin.run()
+        plugin._end_of_directory = False
+        plugin.clear_added_items()
+        return items
     return run
 
 
@@ -85,7 +88,7 @@ class TestBasicRouting(TestCase):
         plugin = NewPlugin()
         @plugin.route('/')
         def main_menu():
-            return 'Hello XBMC'
+            return [{'label': 'Hello XBMC'}]
         self.assertEqual(plugin.url_for('main_menu'), 'plugin://plugin.video.helloxbmc/')
         self.assertEqual(plugin.url_for('main_menu', foo='bar'), 'plugin://plugin.video.helloxbmc/?foo=bar')
         self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=I3%0A.&_pickled=foo')
@@ -95,7 +98,7 @@ class TestBasicRouting(TestCase):
         @plugin.route('/')
         @plugin.route('/videos/', name='videos')
         def main_menu():
-            return 'Hello XBMC'
+            return [{'label': 'Hello XBMC'}]
         self.assertEqual(plugin.url_for('main_menu'), 'plugin://plugin.video.helloxbmc/')
         self.assertEqual(plugin.url_for('main_menu', foo='bar'), 'plugin://plugin.video.helloxbmc/?foo=bar')
         self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=I3%0A.&_pickled=foo')
@@ -105,7 +108,7 @@ class TestBasicRouting(TestCase):
         plugin = NewPlugin()
         @plugin.route('/person/<name>/', options={'name': 'dave'})
         def person(name):
-            return 'Hello %s' % name
+            return [{'label': 'Hello %s' % name}]
         self.assertEqual(plugin.url_for('person', name='jon'), 'plugin://plugin.video.helloxbmc/person/jon/')
         self.assertEqual(plugin.url_for('person'), 'plugin://plugin.video.helloxbmc/person/dave/')
 
@@ -113,11 +116,11 @@ class TestBasicRouting(TestCase):
         plugin = NewPlugin()
         @plugin.route('/')
         def main_menu():
-            return 'Hello XBMC'
+            return [{'label': 'Hello XBMC'}]
         with preserve_cli_mode(cli_mode=False):
             test_run = _TestPluginRunner(plugin)
             resp = test_run('/')
-            self.assertEqual('Hello XBMC', resp)
+            self.assertEqual('Hello XBMC', resp[0].get_label())
 
     def test_options_routing(self):
         plugin = NewPlugin()
@@ -125,15 +128,17 @@ class TestBasicRouting(TestCase):
         @plugin.route('/')
         @plugin.route('/dave/', options={'name': 'dave'})
         def person(name='chris'):
-            return 'Hello %s' % name
+            return [{'label': 'Hello %s' % name}]
         with preserve_cli_mode(cli_mode=False):
             test_run = _TestPluginRunner(plugin)
             resp = test_run('/person/jon/')
-            self.assertEqual('Hello jon', resp)
+            self.assertEqual('Hello jon', resp[0].get_label())
+            print resp
             resp = test_run('/dave/')
-            self.assertEqual('Hello dave', resp)
+            print resp
+            self.assertEqual('Hello dave', resp[0].get_label())
             resp = test_run('/')
-            self.assertEqual('Hello chris', resp)
+            self.assertEqual('Hello chris', resp[0].get_label())
 
     #def test_route_conflict(self):
         # TODO this should raise an error
@@ -158,11 +163,11 @@ class TestBasicRouting(TestCase):
             return plugin.redirect(url)
         @plugin.route('/videos/')
         def videos():
-            return 'Hello Videos'
+            return [{'label': 'Hello Videos'}]
         with preserve_cli_mode(cli_mode=False):
             test_run = _TestPluginRunner(plugin)
             resp = test_run('/')
-            self.assertEqual('Hello Videos', resp)
+            self.assertEqual('Hello Videos', resp[0].get_label())
 
 class TestRegisterModule():
     pass
