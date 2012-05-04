@@ -15,8 +15,7 @@ A micro framework to enable rapid development of XBMC plugins.
 
 ## Documentation
 
-The current documentation can be found at
-http://readthedocs.org/docs/xbmcswift2/en/latest/
+The current documentation can be found at http://www.xbmcswift.com
 
 ## Development
 
@@ -26,5 +25,7 @@ backwards compatible with the original version.
 
 
 ## Contact
+
 https://github.com/jbeluch/xbmcswift2
+
 xbmc@jonathanbeluch.com
