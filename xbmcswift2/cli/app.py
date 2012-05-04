@@ -12,6 +12,7 @@ if so:
         handles testing
 '''
 import sys
+import logging
 from optparse import OptionParser
 from xbmcswift2.common import Modes
 from xbmcswift2.request import Request
@@ -36,6 +37,8 @@ def setup_plugin(PluginClass):
     :meth:`~xbmcswift2.Plugin.run`.
     '''
     opts, mode, url = parse_cli()
+    setup_options(opts)
+
     handle = 0
 
     handlers = {
@@ -66,6 +69,18 @@ def setup_plugin(PluginClass):
         return run_wrapper
 
     PluginClass.run = decorator(PluginClass.run)
+
+
+def setup_options(opts):
+    '''Takes any actions necessary based on command line options'''
+    if opts.quiet:
+        logger.log.setLevel(logging.WARNING)
+        logger.GLOBAL_LOG_LEVEL = logging.WARNING
+
+    if opts.verbose:
+        print 'in verbose'
+        logger.log.setLevel(logging.DEBUG)
+        logger.GLOBAL_LOG_LEVEL = logging.DEBUG
 
 
 def patch_sysargv(*args):
@@ -151,8 +166,8 @@ def parse_cli():
     parser.description = parse_cli.__doc__
     #parser.set_usage(USAGE)
 
-    #parser.add_option('-q', '--quiet', action='store_true')
-    #parser.add_option('-v', '--verbose', action='store_true')
+    parser.add_option('-q', '--quiet', action='store_true')
+    parser.add_option('-v', '--verbose', action='store_true')
     #parser.add_option('-V', '--version', action='store_true')
 
     opts, args = parser.parse_args()

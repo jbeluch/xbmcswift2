@@ -71,7 +71,7 @@ class XBMCFilter(object):
             return False
 
 
-GLOBAL_LOG_LEVEL = logging.DEBUG
+GLOBAL_LOG_LEVEL = logging.INFO
 
 
 def setup_log(name):
@@ -83,7 +83,6 @@ def setup_log(name):
     _log = logging.getLogger(name)
     _log.setLevel(GLOBAL_LOG_LEVEL)
     handler = logging.StreamHandler()
-    handler.setLevel(GLOBAL_LOG_LEVEL)
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)s - [%(name)s] %(message)s')
     handler.setFormatter(formatter)
