@@ -242,12 +242,8 @@ class Plugin(XBMCMixin):
         log.debug('Redirecting %s to %s' % (self.request.path, new_request.path))
         return self._dispatch(new_request.path)
 
-    def run(self):
+    def run(self, test=False):
         '''The main entry point for a plugin.'''
-        if xbmcswift2.CLI_MODE:
-            from xbmcswift2.cli import app
-            app.plugin_runner(self)
-        else:
-            self._request = self._parse_request()
-            log.debug('Handling incoming request for %s' % (self.request.path))
-            return self._dispatch(self.request.path)
+        self._request = self._parse_request()
+        log.debug('Handling incoming request for %s' % (self.request.path))
+        return self._dispatch(self.request.path)

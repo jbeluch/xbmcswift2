@@ -68,6 +68,10 @@ from xbmcswift2.constants import SortMethod, VIEW_MODES
 from xbmcswift2.listitem import ListItem
 from xbmcswift2.log import setup_log
 from xbmcswift2.module import Module
-from xbmcswift2.plugin import Plugin
 from xbmcswift2.urls import AmbiguousUrlException, NotFoundException, UrlRule
 from xbmcswift2.xbmcmixin import XBMCMixin
+from xbmcswift2.plugin import Plugin
+
+if CLI_MODE:
+    from xbmcswift2.cli.app import setup_plugin
+    setup_plugin(Plugin)

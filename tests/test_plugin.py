@@ -75,7 +75,7 @@ def _TestPluginRunner(plugin):
     def run(relative_url, handle=0, qs='?'):
         url = 'plugin://%s%s' % (plugin.id, relative_url)
         sys.argv = [url, handle, qs]
-        items =  plugin.run()
+        items =  plugin.run(test=True)
         plugin._end_of_directory = False
         plugin.clear_added_items()
         return items
@@ -132,10 +132,9 @@ class TestBasicRouting(TestCase):
         with preserve_cli_mode(cli_mode=False):
             test_run = _TestPluginRunner(plugin)
             resp = test_run('/person/jon/')
+            print plugin.request.url
             self.assertEqual('Hello jon', resp[0].get_label())
-            print resp
             resp = test_run('/dave/')
-            print resp
             self.assertEqual('Hello dave', resp[0].get_label())
             resp = test_run('/')
             self.assertEqual('Hello chris', resp[0].get_label())

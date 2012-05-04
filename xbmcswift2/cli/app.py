@@ -19,35 +19,73 @@ from xbmcswift2.log import log
 from xbmcswift2.cli.console import display_listitems, continue_or_quit, get_user_choice
 from xbmcswift2.listitem import ListItem
 
-def plugin_runner(plugin):
-    '''Handles running a plugin from the CLI.'''
+
+def setup_plugin(PluginClass):
+    '''This function is automatically called when upon import of xbmcswift when
+    in CLI mode.
+
+    This function wraps the :meth:`~xbmcswift2.Plugin.run` method for the
+    Plugin class. This enables the repeated execution of plugin.run() for crawl
+    and interactive mode.
+
+    This function also parses the command line, so if any logging flags are set
+    they can be handled immediately.
+
+    If you wish to test a plugin from the command line without the additional
+    wrapper, pass True for the test keyword arg when calling
+    :meth:`~xbmcswift2.Plugin.run`.
+    '''
     opts, mode, url = parse_cli()
-    url = url or 'plugin://%s/' % plugin.id
     handle = 0
-    patch_plugin(plugin, url, handle)
 
     handlers = {
-       #Modes.XBMC: plugin._dispatch,
        Modes.ONCE:once,
        Modes.CRAWL: crawl,
        Modes.INTERACTIVE: interactive,
-   }
-    request_handler = handlers[mode]
-    log.debug('Dispatching %s to %s' %
-              (plugin.request.path, request_handler.__name__))
-    request_handler(plugin)
-    #return request_handler(plugin.request.path)
+    }
+    handler = handlers[mode]
+
+    def decorator(original_run):
+        '''A decorator to wrap the :meth:`~xbmcswift2.Plugin.run` method.'''
+
+        def run_wrapper(self, test=False):
+            '''A wrapper for :meth:`~xbmcswift2.Plugin.run`. If test=True then
+            the wrapper will pass through silently. Otherwise, the CLI mode
+            will be respected.
+            '''
+            # If the user created the plugin with the testing flag set to True,
+            # we don't want to use our CLI wrapper.
+            if test:
+                return original_run(self)
+
+            # At this point, we are in CLI mode and the user has not requested
+            # test mode. This is the normal behavior when running addons from
+            # the command line.
+            patch_sysargv(url or 'plugin://%s/' % self.id, handle)
+            return handler(self, original_run)
+        return run_wrapper
+
+    PluginClass.run = decorator(PluginClass.run)
+
+
+def patch_sysargv(*args):
+    '''Patches sys.argv with the provided args'''
+    sys.argv = args[:]
 
 
 def patch_plugin(plugin, path, handle=None):
+    '''Patches a few attributes of a plugin instance to enable a new call to
+    plugin.run()
+    '''
     if handle is None:
         handle = plugin.request.handle
-    plugin._request = Request(path, handle)
+    patch_sysargv(path, handle)
     plugin._end_of_directory = False
 
-def once(plugin, parent_item=None):
+
+def once(plugin, _run, parent_item=None):
     plugin.clear_added_items()
-    items = plugin._dispatch(plugin.request.path)
+    items = _run(plugin)
 
     # Prepend the parent_item if given
     if parent_item is not None:
@@ -58,8 +96,8 @@ def once(plugin, parent_item=None):
 
 
 # TODO: clear plugin's listitem state
-def interactive(plugin):
-    items = [item for item in once(plugin) if not item.get_played()]
+def interactive(plugin, _run):
+    items = [item for item in once(plugin, _run) if not item.get_played()]
     parent_stack = []  # Keep track of parents so we can have a '..' option
 
     selected_item = get_user_choice(items)
@@ -78,12 +116,12 @@ def interactive(plugin):
         parent_item = None
         if parent_stack:
             parent_item = parent_stack[-1]
-        items = [item for item in once(plugin, parent_item=parent_item)
+        items = [item for item in once(plugin, _run, parent_item=parent_item)
                  if not item.get_played()]
         selected_item = get_user_choice(items)
 
 
-def crawl(plugin):
+def crawl(plugin, _run):
     '''Performs a breadth-first crawl of all possible routes from the
     starting path. Will only visit a URL once, even if it is referenced
     multiple times in a plugin. Requires user interaction in between each
@@ -91,7 +129,7 @@ def crawl(plugin):
     '''
     # TODO: use OrderedSet?
     paths_visited = set()
-    paths_to_visit = set(item.get_path() for item in once(plugin))
+    paths_to_visit = set(item.get_path() for item in once(plugin, _run))
 
     while paths_to_visit and continue_or_quit():
         path = paths_to_visit.pop()
@@ -99,7 +137,7 @@ def crawl(plugin):
 
         # Run the new listitem
         patch_plugin(plugin, path)
-        new_paths = set(item.get_path() for item in once(plugin))
+        new_paths = set(item.get_path() for item in once(plugin, _run))
 
         # Filter new items by checking against urls_visited and
         # urls_tovisit
