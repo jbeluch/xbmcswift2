@@ -47,7 +47,6 @@ try:
     CLI_MODE = False
 except ImportError:
     CLI_MODE = True
-    # TODO: delete unneeded modules
 
     import sys
     from log import log
@@ -61,13 +60,14 @@ except ImportError:
     xbmcvfs = module()
 
 
-# Now get on with the xbmcswift stuff
-from request import Request
-from common import (pickle_dict, unpickle_dict, clean_dict,
-    download_page, unhex)
-import constants
-from plugin import Plugin, Modes
-from xbmcmixin import XBMCMixin
-from module import Module
-from urls import (AmbiguousUrlException, NotFoundException, UrlRule)
-from listitem import ListItem
+from xbmcswift2.cache import Cache, TimedCache
+from xbmcswift2.request import Request
+from xbmcswift2.common import (xbmc_url, enum, clean_dict, pickle_dict,
+    unpickle_args, unpickle_dict, download_page, unhex)
+from xbmcswift2.constants import SortMethod, VIEW_MODES
+from xbmcswift2.listitem import ListItem
+from xbmcswift2.log import setup_log
+from xbmcswift2.module import Module
+from xbmcswift2.plugin import Plugin
+from xbmcswift2.urls import AmbiguousUrlException, NotFoundException, UrlRule
+from xbmcswift2.xbmcmixin import XBMCMixin
