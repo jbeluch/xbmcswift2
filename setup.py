@@ -45,7 +45,7 @@ setup(
     ],
     entry_points={
        'console_scripts': [
-           'xbmcswift2 = xbmcswift2.cli.create:main',
+           'xbmcswift2 = xbmcswift2.cli.cli:main',
        ]
     },
 )

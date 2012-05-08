@@ -1,6 +1,6 @@
 '''
     xbmcswift2
-    ------------------
+    ----------
 
     A micro framework to enable rapid development of XBMC plugins.
 
@@ -71,7 +71,3 @@ from xbmcswift2.module import Module
 from xbmcswift2.urls import AmbiguousUrlException, NotFoundException, UrlRule
 from xbmcswift2.xbmcmixin import XBMCMixin
 from xbmcswift2.plugin import Plugin
-
-if CLI_MODE:
-    from xbmcswift2.cli.app import setup_plugin
-    setup_plugin(Plugin)

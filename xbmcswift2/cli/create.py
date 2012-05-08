@@ -1,8 +1,8 @@
 '''
-    xbmcswift2.create
-    ------------------
+    xbmcswift2.cli.create
+    ---------------------
 
-    This module contains the CLI interface to xbmcswift2.
+    This module contains the code to initialize a new XBMC addon project.
 
     :copyright: (c) 2012 by Jonathan Beluch
     :license: GPLv3, see LICENSE for more details.
@@ -13,6 +13,18 @@ import readline
 from os import getcwd
 from optparse import OptionParser
 from shutil import copytree, ignore_patterns
+
+
+class CreateCommand(object):
+    '''A CLI command to initialize a new XBMC addon project.'''
+
+    command = 'create'
+    usage = '%prog create'
+
+    @staticmethod
+    def run(opts, args):
+        '''Required run function for the 'create' CLI command.'''
+        create_new_project()
 
 
 # Path to skeleton file templates dir
@@ -163,23 +175,3 @@ def create_new_project():
 
     print 'Projects successfully created in %s.' % opts['plugin_dir']
     print 'Done.'
-
-
-def main():
-    '''Entry point for the console script. Specified in setup.py'''
-    modes = {
-        'create': create_new_project,
-    }
-
-    opts, args = parse_cli()
-    assert args, 'Requires at least one positional argument.'
-
-    mode = args[0]
-    assert mode in modes.keys(), (
-        'Requires a valid mode as the first positional argument.'
-        ' Valid modes are %s.' % \
-            ', '.join('"%s"' % m for m in modes.keys())
-    )
-
-    # Run the requested mode
-    modes[mode]()

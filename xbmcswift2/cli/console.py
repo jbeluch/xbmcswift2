@@ -1,14 +1,12 @@
 '''
-    xbmcswift2.console
-    ------------------
+    xbmcswift2.cli.console
+    ----------------------
 
     This module contains code to handle CLI interaction.
 
     :copyright: (c) 2012 by Jonathan Beluch
     :license: GPLv3, see LICENSE for more details.
 '''
-from optparse import OptionParser
-from xbmcswift2.common import Modes
 
 
 def get_max_len(items):
@@ -38,7 +36,8 @@ def display_listitems(items):
 
         header = [
             '-' * line_width,
-            '%s %s Path' % ('#'.center(num_width + 2), 'Label'.ljust(label_width)),
+            '%s %s Path' % ('#'.center(num_width + 2),
+                            'Label'.ljust(label_width)),
             '-' * line_width,
         ]
         print '\n'.join(header + output)
