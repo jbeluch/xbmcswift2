@@ -179,6 +179,11 @@ class XBMCMixin(object):
         provided list should either be instances of xbmcswift2.ListItem,
         or regular dictionaries that will be passed to
         xbmcswift2.ListItem.from_dict. Returns the list of ListItems.
+
+        :param items: An iterable of items where each item is either a
+                      dictionary with keys/values suitable for passing to
+                      :meth:`xbmcswift2.ListItem.from_dict` or an instance of
+                      :class:`xbmcswift2.ListItem`.
         '''
         # For each item if it is not already a list item, we need to create one
         _items = []
@@ -206,7 +211,7 @@ class XBMCMixin(object):
         self._end_of_directory.
 
         Typically it is not necessary to call this method directly, as
-        calling plugin.finish will call this.
+        calling :meth:`~xbmcswift2.Plugin.finish` will call this method.
         '''
         if not self._end_of_directory:
             self._end_of_directory = True
@@ -222,15 +227,16 @@ class XBMCMixin(object):
         xbmcswift2.ListItem or a dictionary that will be passed to
         xbmcswift2.ListItem.from_dict().
 
-        sort_methods should be a list of valid XBMC sort_methods. The
-        reamaining keyword arguments are passed along to
-        xbmcplugin.endOfDirectory.
-
-        view_mode can either be an integer (or parseable integer
-        string) corresponding to a view_mode or the name of a type of
-        view. Currrently the only view type supported is 'thumbnail'.
-
-        Returns a list of all ListItems added to the XBMC interface.
+        :param items: an iterable of items where each item is either a
+            dictionary with keys/values suitable for passing to
+            :meth:`xbmcswift2.ListItem.from_dict` or an instance of
+            :class:`xbmcswift2.ListItem`.
+        :param sort_methods: a list of valid XBMC sort_methods. See
+            :attr:`xbmcswift2.SortMethod`.
+        :param view_mode: can either be an integer (or parseable integer
+            string) corresponding to a view_mode or the name of a type of view.
+            Currrently the only view type supported is 'thumbnail'.
+        :returns: a list of all ListItems added to the XBMC interface.
         '''
         # If we have any items, add them. Items are optional here.
         if items:
@@ -262,20 +268,3 @@ class XBMCMixin(object):
 
         # Return the cached list of all the list items that were added
         return self.added_items
-
-
-#class XBMCProxyMixin(XBMCMixin):
-
-    #_PROXY_METHODS = [ 'add_items', 'end_of_directory', 'finish', 'cache_fn',
-        #'temp_fn', 'get_string', 'set_content', 'get_setting', 'set_setting',
-        #'open_settings', 'add_to_playlist', 'set_resolved_url', 'play_video',
-    #]
-    #def __get_item__(self, attr):
-        #if attr in Module._PROXY_METHODS:
-            #_validate_registered(self)
-            #return getattr(self.plugin, attr)
-        ##return normal
-        #pass
-
-    # TODO: write some code (metaclass?) that appends a registration
-    # required message to every method's __doc__  in _PROXY_METHODS
