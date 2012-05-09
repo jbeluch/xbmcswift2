@@ -153,6 +153,11 @@ def release_prepare(xbmc_version):
     copydir(os.path.join(local_repo.path, 'xbmcswift2'),
             os.path.join(dist_path, 'lib', 'xbmcswift2'))
 
+    # Remove the cli and mockxbmc packages as they are not necessary for XBMC
+    # execution
+    rmdir(os.path.join(dist_path, 'lib', 'xbmcswift2', 'cli'))
+    rmdir(os.path.join(dist_path, 'lib', 'xbmcswift2', 'mockxbmc'))
+
     # Now we need to add the current git HEAD to a file in the dist repo
     write_file(os.path.join(dist_path, 'xbmcswift2_version'),
                current_git_version)
