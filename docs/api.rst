@@ -15,14 +15,6 @@ Plugin Object
     :inherited-members:
 
 
-Module
-------
-
-.. autoclass:: Module
-    :members:
-    :inherited-members:
-
-
 ListItem
 --------
 
@@ -35,5 +27,31 @@ Request
 -------
 
 .. autoclass:: Request
+    :members:
+    :inherited-members:
+
+
+Extended API
+------------
+
+Module
+``````
+
+.. autoclass:: Module
+    :members:
+    :inherited-members:
+
+Cache
+`````
+
+.. autoclass:: Cache
+    :members:
+    :inherited-members:
+
+
+TimedCache
+``````````
+
+.. autoclass:: TimedCache
     :members:
     :inherited-members:

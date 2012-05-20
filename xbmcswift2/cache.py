@@ -37,7 +37,8 @@ class PersistentDictMixin(object):
         self.file_format = file_format      # 'csv', 'json', or 'pickle'
         self.filename = filename
         if flag != 'n' and os.access(filename, os.R_OK):
-            log.debug('Reading %s cache from disk at "%s"' % (self.file_format, self.filename))
+            log.debug('Reading %s cache from disk at "%s"' % (self.file_format,
+                                                              self.filename))
             fileobj = open(filename, 'rb' if file_format == 'pickle' else 'r')
             with fileobj:
                 self.load(fileobj)
@@ -100,7 +101,19 @@ class PersistentDictMixin(object):
 
 
 class Cache(collections.MutableMapping, PersistentDictMixin):
-    '''A dict with the ability to persist to disk'''
+    '''A cache that acts like a dict but also can persist to disk.
+
+    :param filename: An absolute filepath to reprsent the cache on disk. The
+                     cache will loaded from this file if it already exists,
+                     otherwise the file will be created.
+    :param file_format: 'pickle', 'json' or 'csv'. pickle is the default. Be
+                        aware that json and csv have limited support for python
+                        objets.
+
+    .. warning:: Currently there are no limitations on the size of the cache.
+                 Please be sure to call :meth:`~xbmcswift2.Cache.clear`
+                 periodically.
+    '''
 
     def __init__(self, filename, file_format='pickle'):
         '''Acceptable formats are 'csv', 'json' and 'pickle'.'''

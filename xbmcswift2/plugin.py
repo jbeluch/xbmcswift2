@@ -1,3 +1,13 @@
+'''
+    xbmcswift2.plugin
+    -----------------
+
+    This module contains the Plugin class. This class handles all of the url
+    routing and interaction with XBMC for a plugin.
+
+    :copyright: (c) 2012 by Jonathan Beluch
+    :license: GPLv3, see LICENSE for more details.
+'''
 import os
 import sys
 import pickle
@@ -30,7 +40,7 @@ class Plugin(XBMCMixin):
     plugin. Typical creation looks like this::
 
         from xbmcswift2 import Plugin
-        plugin = Plugin('Academic Earth', 'plugin.video.academicearth', __file__)
+        plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', __file__)
 
     :param name: The name of the plugin, e.g. 'Academic Earth'.
     :param addon_id: The XBMC addon ID for the plugin, e.g.
@@ -151,7 +161,12 @@ class Plugin(XBMCMixin):
 
     def register_module(self, module, url_prefix):
         '''Registers a module with a plugin. Requires a url_prefix that
-        will then enable calls to url_for.'''
+        will then enable calls to url_for.
+
+        :param module: Should be an instance `xbmcswift2.Module`.
+        :param url_prefix: A url prefix to use for all module urls,
+                           e.g. '/mymodule'
+        '''
         module._plugin = self
         module._url_prefix = url_prefix
         for func in module._register_funcs:

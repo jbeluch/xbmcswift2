@@ -1,3 +1,13 @@
+'''
+    xbmcswift2.request
+    ------------------
+
+    This module contains the Request class. This class represents an incoming
+    request from XBMC.
+
+    :copyright: (c) 2012 by Jonathan Beluch
+    :license: GPLv3, see LICENSE for more details.
+'''
 from xbmcswift2.common import unpickle_args
 import urlparse
 try:
@@ -14,7 +24,7 @@ class Request(object):
                 passes the URL query string in a separate argument from the
                 base URL, they must be joined into a single string before being
                 provided.
-    :param handle: The handle for the current plugin.
+    :param handle: The handle associated with the current request.
     '''
 
     def __init__(self, url, handle):
@@ -28,5 +38,6 @@ class Request(object):
         # relative url, e.g. //plugin.video.helloxbmc/path
         self.scheme, remainder = url.split(':', 1)
         parts = urlparse.urlparse(remainder)
-        _, self.netloc, self.path, self.query_string = parts[0], parts[1], parts[2], parts[4]
+        self.netloc, self.path, self.query_string = (
+            parts[1], parts[2], parts[4])
         self.args = unpickle_args(parse_qs(self.query_string))
