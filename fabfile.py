@@ -19,8 +19,10 @@ from fabric.api import *
 from fabric.colors import green
 
 
+EDITOR = 'vim'
 REPO_DIR = 'xbmcswift2-xbmc-dist'
 REPO_URL = 'git@github.com:jbeluch/xbmcswift2-xbmc-dist.git'
+REPO_PUBLIC_URL = 'git://github.com/jbeluch/xbmcswift2-xbmc-dist.git'
 BRANCHES = {
     # <xbmc_version>: <git_branch>
     'DHARMA': 'dharma',
@@ -75,6 +77,11 @@ def get_addon_version(addon_dir):
     xml = ET.parse(filename).getroot()
     return xam.Addon(xml).version
 
+def get_addon_id(addon_dir):
+    filename = os.path.join(addon_dir, 'addon.xml')
+    xml = ET.parse(filename).getroot()
+    return xam.Addon(xml).id
+
 def set_addon_version(addon_dir, version):
     filename = os.path.join(addon_dir, 'addon.xml')
     xml = ET.parse(filename).getroot()
@@ -111,6 +118,20 @@ def write_file(path, contents):
     puts('Writing content to %s' % path)
     with open(path, 'w') as out:
         out.write(contents)
+
+
+def print_email(addon_id, version, git_url, tag, xbmc_version):
+    print 'Mailing List Email'
+    print '------------------'
+    print
+    print 'Subject: [git pull] %s' % addon_id
+    print '*addon - %s' % addon_id
+    print '*version - %s' % version
+    print '*url - %s' % git_url
+    print '*tag - %s' % tag
+    print '*xbmc version - %s' % xbmc_version
+    print
+    print
 
 
 @task
@@ -197,3 +218,7 @@ def release_perform(xbmc_version):
     os.remove(os.path.join(os.path.dirname(__file__), '.release'))
 
     puts(green('Release performed.'))
+
+    # write the email
+    addon_id = get_addon_id(dist_path)
+    print_email(addon_id, version, REPO_PUBLIC_URL, version, xbmc_version.lower())
