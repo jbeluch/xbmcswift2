@@ -14,9 +14,10 @@ import tempfile
 import shutil
 import os
 from xml.etree import ElementTree as ET
+import subprocess
 import xam
 from fabric.api import *
-from fabric.colors import green
+import fabric.colors as colors
 
 
 EDITOR = 'vim'
@@ -28,6 +29,13 @@ BRANCHES = {
     'DHARMA': 'dharma',
     'EDEN': 'master',
 }
+
+
+def log(msg, important=False):
+    if important:
+        puts(colors.green(msg))
+    else:
+        puts(colors.yellow(msg))
 
 
 class GitRepo(object):
@@ -109,11 +117,6 @@ def copydir(src, dest):
     shutil.copytree(src, dest)
 
 
-def read_file(path):
-    with open(path) as inp:
-        return inp.read()
-
-
 def write_file(path, contents):
     puts('Writing content to %s' % path)
     with open(path, 'w') as out:
@@ -121,35 +124,33 @@ def write_file(path, contents):
 
 
 def print_email(addon_id, version, git_url, tag, xbmc_version):
-    print 'Mailing List Email'
-    print '------------------'
-    print
-    print 'Subject: [git pull] %s' % addon_id
-    print '*addon - %s' % addon_id
-    print '*version - %s' % version
-    print '*url - %s' % git_url
-    print '*tag - %s' % tag
-    print '*xbmc version - %s' % xbmc_version
-    print
-    print
+    lines = [
+        'Mailing List Email',
+        '------------------',
+        '',
+        'Subject: [git pull] %s' % addon_id,
+        '*addon - %s' % addon_id,
+        '*version - %s' % version,
+        '*url - %s' % git_url,
+        '*tag - %s' % tag,
+        '*xbmc version - %s' % xbmc_version,
+        '',
+        '',
+    ]
+
+    for line in lines:
+        puts(colors.cyan(line))
 
 
 @task
-def release(xbmc_version=None, release_task=None):
+def release(xbmc_version=None):
     if xbmc_version is None:
         abort('Must specify an XBMC version, [dharma, eden]')
     xbmc_version = xbmc_version.upper()
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    if release_task == 'prepare':
-        release_prepare(xbmc_version)
-    elif release_task == 'perform':
-        release_perform(xbmc_version)
-    elif release_task == 'clear':
-        release_clear()
-    else:
-        print 'error'
+    release_prepare(xbmc_version)
 
 
 def release_prepare(xbmc_version):
@@ -160,64 +161,68 @@ def release_prepare(xbmc_version):
     # First get the current git version so we can include this in the release
     local_repo = GitRepo(path=os.path.dirname(__file__))
     current_git_version =  local_repo.get_head_hash()
+    log('Release using commit %s' % current_git_version)
 
     # Clone a fresh copy of the current dist repo
+    log('Cloning fresh copy of distribution repo...')
     dist_repo = GitRepo(path=dist_path, remote_url=REPO_URL)
     dist_repo.clone(parent_dir)
 
     # Checkout the proper branch
+    log('Using branch %s for the distribution repo...' % BRANCHES[xbmc_version])
     dist_repo.checkout_remote_branch(BRANCHES[xbmc_version])
 
     # We could rsync, but easier to just remove existing xbmcswift2 dir and
     # copy over the current version
+    log('Removing old xbmcswift2 dir and copying over current version...')
     rmdir(os.path.join(dist_path, 'lib', 'xbmcswift2'))
     copydir(os.path.join(local_repo.path, 'xbmcswift2'),
             os.path.join(dist_path, 'lib', 'xbmcswift2'))
 
     # Remove the cli and mockxbmc packages as they are not necessary for XBMC
     # execution
+    log('Removing unneccessary cli and mockxbmc packages...')
     rmdir(os.path.join(dist_path, 'lib', 'xbmcswift2', 'cli'))
     rmdir(os.path.join(dist_path, 'lib', 'xbmcswift2', 'mockxbmc'))
 
     # Now we need to add the current git HEAD to a file in the dist repo
+    log('Adding deployed git hash to xbmcswift2_version file...')
     write_file(os.path.join(dist_path, 'xbmcswift2_version'),
                current_git_version)
 
     # Prompt user for new XBMC version
+    log('Bumping version...')
     bump_version(dist_path)
 
+    # open changelog in vim
+    log('Opening changelog.txt for editing...')
+    changelog = os.path.join(dist_path, 'changelog.txt')
+
+    # if user doesn't want to continue they shouldu be able to :cq
+    returncode = subprocess.check_call([EDITOR, changelog])
+
     # Stage everything in the repo
+    log('Staging all modified files in the distribution repo...')
     dist_repo.stage_all()
 
-    # Write the path to our tempfile to a local .release file
-    write_file(os.path.join(os.path.dirname(__file__), '.release'), dist_path)
-
-    puts(green('Release preparation complete. Please update and `git add` the changelog. Then run `fab release:perform`.'))
+    release_perform(xbmc_version, dist_path)
 
 
-def release_clear():
-    puts('Removing current .release file')
-    os.remove(os.path.join(os.path.dirname(__file__), '.release'))
-
-
-def release_perform(xbmc_version):
-    dist_path = read_file('.release')
-
+def release_perform(xbmc_version, dist_path):
     # Get the current XBMC version
     version = get_addon_version(dist_path)
 
     # Commit all staged changes and tag
+    log('Commiting changes and tagging the release...')
     dist_repo = GitRepo(path=dist_path)
     dist_repo.commit(version)
     dist_repo.tag(version, xbmc_version.lower())
 
     # Push everything
+    log('Pushing changes to remote...')
     dist_repo.push(BRANCHES[xbmc_version])
 
-    # Remove release file
-    os.remove(os.path.join(os.path.dirname(__file__), '.release'))
-
-    puts(green('Release performed.'))
+    puts(colors.green('Release performed.'))
 
     # write the email
     addon_id = get_addon_id(dist_path)
