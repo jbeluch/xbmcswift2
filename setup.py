@@ -9,10 +9,10 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name = 'XBMC Swift',
-    version = '0.1-dev',
+    name = 'xbmcswift2',
+    version = '0.1',
     author = 'Jonathan Beluch',
-    author_email = 'xbmc@jonathanbeluch.com',
+    author_email = 'web@jonathanbeluch.com',
     description = 'A micro framework for rapid development of XBMC plugins.',
     license = "GPL3",
     keywords = "example documentation tutorial",
