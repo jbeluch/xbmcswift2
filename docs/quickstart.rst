@@ -101,7 +101,7 @@ what does the code do?
 
 3. The index function creates a dictionary with a single key/val pair,
    ``label``. In the simplest form of a plugin, we can just return a list of
-   dictionaries containg the values to be translated to list items. Note that
+   dictionaries containing the values to be translated to list items. Note that
    for xbmcswift2 to function properly, we must always return a list of items.
 
 4. We call ``plugin.run()`` to run our plugin.
@@ -111,10 +111,10 @@ Running Addons from the Command Line
 ------------------------------------
 
 One of the shining points of xbmcswift2 is the ability to run plugins from the
-command line. To do so, simply run addon.py like you would any other python
-file::
+command line. To do so, ensure your working directory is the root of your addon
+folder (where you addon.xml file is located) and execute ``xbmcswift2 run``.::
 
-    $ python addon.py 
+    $ xbmcswift2 run
     2012-05-02 19:02:37,785 - DEBUG - [xbmcswift2] Adding url rule "/" named "index" pointing to function "index"
     2012-05-02 19:02:37,798 - DEBUG - [xbmcswift2] Dispatching / to once
     2012-05-02 19:02:37,798 - INFO - [xbmcswift2] Request for "/" matches rule for function "index"
@@ -125,21 +125,22 @@ file::
     ----------------------
 
 Right away we can see the output of our plugin. When running in the CLI,
-xbmcswift2 prints log messages to STDERR. Below the logs we can see a simple
+xbmcswift2 prints log messages to STDERR, so you can hide them by appending
+``2>/dev/null`` to the previous command.. Below the logs we can see a simple
 display of our listitems, in this case a single item.
 
 
 URL Routing
 -----------
 
-One of the advantages of using xbmcswift2, is its clean URL routing code. This
+Another advantage of using xbmcswift2, is its clean URL routing code. This
 means you don't have to write your own code to parse the URL provided by XBMC
 and route it to a specific function. xbmcswift2 uses a a path passed to the
 :meth:`~xbmcswift2.Plugin.route` decorator to bind a URL to a function. For
 example, a route of ``/videos/`` will result in a URL of
-``plugin://plugin.video.helloxbmc/videos/`` to call the decorated function.
+``plugin://plugin.video.helloxbmc/videos/`` calling the decorated function.
 
-It's even possible to pass variables to functions, from the URLs. You might
+It's even possible to pass variables to functions from the URLs. You might
 have a function like this to list videos for a given category:
 
 .. sourcecode:: python
@@ -180,7 +181,7 @@ link list items to other views in our code? We'll modify our Hello XBMC addon:
 
 Let's run our plugin interactively now to explore::
 
-    $ ./addon.py interactive
+    $ xbmcswift2 run interactive
     2012-05-02 19:14:53,792 - DEBUG - [xbmcswift2] Adding url rule "/" named "index" pointing to function "index"
     2012-05-02 19:14:53,792 - DEBUG - [xbmcswift2] Adding url rule "/labels/<label>/" named "show_label" pointing to function "show_label"
     2012-05-02 19:14:53,793 - DEBUG - [xbmcswift2] Dispatching / to interactive
@@ -212,9 +213,9 @@ Let's run our plugin interactively now to explore::
 
 We've introduced a few new topics here.
 
-* We passed a ``interactive`` as a positional argument to xbmcswift2. This
-  enables us to interact with the list items rather than just print them once
-  and exit.
+* We passed ``interactive`` as a positional argument to the ``xbmcswift2 run``
+  command. This enables us to interact with the list items rather than just
+  print them once and exit.
 
 * We've used :meth:`~xbmcswift2.Plugin.url_for` to create a url pointing to a
   different view function. This is how view functions create list items that
@@ -256,7 +257,7 @@ First, let's add a new view to play some media:
         ]
         return plugin.finish(items)
 
-As you can see, the URL is a direct link to a video asset, we are not calling
+As you can see, the URL value for *path* is a direct link to a video asset, we are not calling
 ``url_for``. If you need to use XBMC's ``setResolveUrl`` functionality, see the
 patterns section for ``plugin.set_resolved_url``.
 
@@ -285,8 +286,8 @@ xbmc modules from xbmcswift2.
    from xbmcswift2 import xbmc, xbmcgui
 
 Since these modules are written in C, they are only available when running
-XBMC. To make plugins run on the command line, XBMC has mock versions of these
-modules.
+XBMC. To enable plugins to run on the command line, xbmcswift2 has mock
+versions of these modules.
 
 
 Going further

@@ -18,6 +18,8 @@ XBMC Swift doesn't rely on any external dependencies to get started. However,
 when writing plugins I like to use <http://BeautifulSoup.org>. Also, when it
 comes to advanced testing of plugins, I like to use <http://nosetests.org>.
 
+For a list of XBMC addons which use xbmcswift2, see :ref:`poweredby`.
+
 
 
 Contents:

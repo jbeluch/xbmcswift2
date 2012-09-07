@@ -4,7 +4,7 @@ Installation
 ============
 
 The quickest (and best) option for installing xbmcswift2 depends on Python 2.5
-or higher and virtualenv.
+or higher, virtualenv and pip.
 
 virtualenv
 ----------
@@ -47,4 +47,4 @@ again, simply::
 
 and to deactive the virtualenv::
 
-    $ deactivatee
+    $ deactivate
