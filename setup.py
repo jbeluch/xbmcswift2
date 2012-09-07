@@ -10,7 +10,7 @@ def read(fname):
 
 setup(
     name = 'xbmcswift2',
-    version = '0.1',
+    version = '0.1-dev',
     author = 'Jonathan Beluch',
     author_email = 'web@jonathanbeluch.com',
     description = 'A micro framework for rapid development of XBMC plugins.',
