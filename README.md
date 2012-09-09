@@ -19,9 +19,12 @@ The current documentation can be found at http://www.xbmcswift.com
 
 ## Development
 
-This project is under heavy development. This project is the next version of
-xbmcswift. While the APIs are similar, there are a few things that are not
-backwards compatible with the original version.
+This module is now available in the official XBMC Eden repository as
+xbmcswift2.
+
+This project is the next version of xbmcswift. While the APIs are similar,
+there are a few things that are not backwards compatible with the original
+version, hence the new name.
 
 
 ## Contact
