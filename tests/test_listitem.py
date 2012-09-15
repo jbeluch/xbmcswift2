@@ -1,4 +1,4 @@
-from unittest2 import TestCase
+from unittest import TestCase
 from xbmcswift2 import xbmcgui, ListItem
 from mock import Mock, patch
 
