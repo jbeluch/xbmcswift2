@@ -44,7 +44,10 @@ class Plugin(XBMCMixin):
 
     :param name: The name of the plugin, e.g. 'Academic Earth'.
     :param addon_id: The XBMC addon ID for the plugin, e.g.
-                     'plugin.video.academicearth'
+                     'plugin.video.academicearth'. This parameter is now
+                     optional and is really only useful for testing purposes.
+                     If it is not provided, the correct value will be parsed
+                     from the addon.xml file.
     :param filepath: Optional parameter. If provided, it should be the path to
                      the addon.py file in the root of the addon directoy. This
                      only has an effect when xbmcswift2 is running on the
@@ -54,12 +57,17 @@ class Plugin(XBMCMixin):
                      testing.
     '''
 
-    def __init__(self, name, addon_id, filepath=None):
+    def __init__(self, name, addon_id=None, filepath=None):
         self._name = name
-        self._addon_id = addon_id
         self._routes = []
         self._view_functions = {}
-        self._addon = xbmcaddon.Addon(id=self._addon_id)
+
+        # addon_id is no longer required as it can be parsed from addon.xml
+        if addon_id:
+            self._addon = xbmcaddon.Addon(id=addon_id)
+        elif xbmcswift2.CLI_MODE:
+            self._addon = xbmcaddon.Addon()
+        self._addon_id = addon_id or self._addon.getAddonInfo('id')
 
         # Keeps track of the added list items
         self._current_items = []
@@ -82,11 +90,11 @@ class Plugin(XBMCMixin):
         # directly, we can rely on cwd for now...
         if xbmcswift2.CLI_MODE:
             from xbmcswift2.mockxbmc import utils
-            if filepath is None:
-                basedir = os.getcwd()
+            if filepath:
+                addon_dir = os.path.dirname(filepath)
             else:
-                basedir = os.path.dirname(filepath)
-            strings_fn = os.path.join(basedir, 'resources', 'language',
+                addon_dir = os.getcwd()
+            strings_fn = os.path.join(addon_dir, 'resources', 'language',
                                       'English', 'strings.xml')
             utils.load_addon_strings(self._addon, strings_fn)
 
