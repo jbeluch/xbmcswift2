@@ -1,6 +1,8 @@
 xbmcswift2
 ==========
 
+[![Build Status](https://secure.travis-ci.org/jbeluch/xbmcswift2.png)](http://travis-ci.org/jbeluch/xbmcswift2)
+
 A micro framework to enable rapid development of XBMC plugins.
 
 
