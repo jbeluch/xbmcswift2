@@ -45,13 +45,17 @@ class Plugin(XBMCMixin):
     :param name: The name of the plugin, e.g. 'Academic Earth'.
     :param addon_id: The XBMC addon ID for the plugin, e.g.
                      'plugin.video.academicearth'
-    :param filepath: The path to the addon.py file. In typical usage, the
-                     builtin ``__file__`` variable can used.
+    :param filepath: Optional parameter. If provided, it should be the path to
+                     the addon.py file in the root of the addon directoy. This
+                     only has an effect when xbmcswift2 is running on the
+                     command line. Will default to the current working
+                     directory since xbmcswift2 requires execution in the root
+                     addon directoy anyway. The parameter still exists to ease
+                     testing.
     '''
 
-    def __init__(self, name, addon_id, filepath):
+    def __init__(self, name, addon_id, filepath=None):
         self._name = name
-        self._filepath = filepath
         self._addon_id = addon_id
         self._routes = []
         self._view_functions = {}
@@ -74,12 +78,17 @@ class Plugin(XBMCMixin):
             'special://profile/addon_data/%s/.cache/' % self._addon_id)
 
         # If we are runing in CLI, we need to load the strings.xml manually
-        # TODO: a better way to do this. Perhaps allow a user provided filepath
+        # Since xbmcswift2 currently relies on execution from an addon's root
+        # directly, we can rely on cwd for now...
         if xbmcswift2.CLI_MODE:
             from xbmcswift2.mockxbmc import utils
-            utils.load_addon_strings(self._addon,
-                os.path.join(os.path.dirname(self._filepath), 'resources',
-                             'language', 'English', 'strings.xml'))
+            if filepath is None:
+                basedir = os.getcwd()
+            else:
+                basedir = os.path.dirname(filepath)
+            strings_fn = os.path.join(basedir, 'resources', 'language',
+                                      'English', 'strings.xml')
+            utils.load_addon_strings(self._addon, strings_fn)
 
     @property
     def log(self):
