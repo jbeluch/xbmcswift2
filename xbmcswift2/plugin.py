@@ -40,14 +40,21 @@ class Plugin(XBMCMixin):
     plugin. Typical creation looks like this::
 
         from xbmcswift2 import Plugin
-        plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', __file__)
+        plugin = Plugin('Hello XBMC')
+
+
+    .. versionchanged:: 0.2
+        The *addon_id* and *filepath* parameters are now optional. They will
+        now default to the correct values.
 
     :param name: The name of the plugin, e.g. 'Academic Earth'.
+
     :param addon_id: The XBMC addon ID for the plugin, e.g.
                      'plugin.video.academicearth'. This parameter is now
                      optional and is really only useful for testing purposes.
                      If it is not provided, the correct value will be parsed
                      from the addon.xml file.
+
     :param filepath: Optional parameter. If provided, it should be the path to
                      the addon.py file in the root of the addon directoy. This
                      only has an effect when xbmcswift2 is running on the
@@ -103,7 +110,11 @@ class Plugin(XBMCMixin):
         '''The log instance for the plugin. Returns an instance of the
         stdlib's ``logging.Logger``. This log will print to STDOUT when running
         in CLI mode and will forward messages to XBMC's log when running in
-        XBMC.
+        XBMC. Some examples::
+
+            plugin.log.debug('Debug message')
+            plugin.log.warning('Warning message')
+            plugin.log.error('Error message')
         '''
         return self._log
 
@@ -119,7 +130,7 @@ class Plugin(XBMCMixin):
 
     @property
     def addon(self):
-        '''This plugin's underlying instance of xbmcaddon.Addon.'''
+        '''This plugin's wrapped instance of xbmcaddon.Addon.'''
         return self._addon
 
     @property
@@ -219,10 +230,12 @@ class Plugin(XBMCMixin):
         rule = UrlRule(url_rule, view_func, name, options)
         if name in self._view_functions.keys():
             # TODO: Raise exception for ambiguous views during registration
-            log.warning('Cannot add url rule "%s" with name "%s". There is already a view with that name' % (url_rule, name))
+            log.warning('Cannot add url rule "%s" with name "%s". There is '
+                        'already a view with that name' % (url_rule, name))
             self._view_functions[name] = None
         else:
-            log.debug('Adding url rule "%s" named "%s" pointing to function "%s"' % (url_rule, name, view_func.__name__))
+            log.debug('Adding url rule "%s" named "%s" pointing to function '
+                      '"%s"' % (url_rule, name, view_func.__name__))
             self._view_functions[name] = rule
         self._routes.append(rule)
 
@@ -253,7 +266,8 @@ class Plugin(XBMCMixin):
                 view_func, items = rule.match(path)
             except NotFoundException:
                 continue
-            log.info('Request for "%s" matches rule for function "%s"' % (path, view_func.__name__))
+            log.info('Request for "%s" matches rule for function "%s"'
+                     % (path, view_func.__name__))
             listitems = view_func(**items)
 
             # TODO: Verify the main UI handle is always 0, this check exists so

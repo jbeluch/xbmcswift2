@@ -72,9 +72,7 @@ find an ``addon.py`` exactly like the one below.
     from xbmcswift2 import Plugin
 
     PLUGIN_NAME = 'Hello XBMC'
-    PLUGIN_ID = 'plugin.video.helloxbmc'
-
-    plugin = Plugin(PLUGIN_NAME, PLUGIN_ID, __file__)
+    plugin = Plugin(PLUGIN_NAME)
 
     @plugin.route('/')
     def index():
