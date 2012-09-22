@@ -91,6 +91,8 @@ class Plugin(XBMCMixin):
         # The path to the cache directory for the addon
         self._cache_path = xbmc.translatePath(
             'special://profile/addon_data/%s/.cache/' % self._addon_id)
+        if not os.path.isdir(self._cache_path):
+            os.makedirs(self._cache_path)
 
         # If we are runing in CLI, we need to load the strings.xml manually
         # Since xbmcswift2 currently relies on execution from an addon's root

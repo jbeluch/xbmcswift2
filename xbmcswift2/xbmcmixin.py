@@ -19,12 +19,16 @@ class XBMCMixin(object):
     the child class must implement the following methods and
     properties:
 
-        def cache_path(self, path)
+        # Also, the child class is responsible for ensuring that this path
+        # exists.
+        self.cache_path  
 
-        self.cache_path
         self.addon
+
         self.added_items
+
         self.request
+
     _end_of_directory = False
     _memoized_cache = None
     _unsynced_caches = None
@@ -78,9 +82,6 @@ class XBMCMixin(object):
         return self._get_cache(TimedCache, cache_name, file_format=file_format)
 
     def cache_fn(self, path):
-        # TODO:
-        #if not os.path.exists(self._cache_path):
-            #os.mkdir(self._cache_path)
         return os.path.join(self.cache_path, path)
 
     def temp_fn(self, path):

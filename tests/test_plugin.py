@@ -1,9 +1,18 @@
+import os
+import sys
+import shutil
 from unittest import TestCase
+from contextlib import contextmanager
+
+from mock import Mock, patch
+
+from xbmcswift2.mockxbmc.xbmc import TEMP_DIR
 from xbmcswift2 import Plugin
 import xbmcswift2
-from contextlib import contextmanager
-from mock import Mock, patch
-import sys
+
+
+# Ensure we are starting clean by removing old test folders
+shutil.rmtree(TEMP_DIR)
 
 
 @contextmanager
@@ -23,12 +32,11 @@ class TestInXBMCMode(TestCase):
 
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
-        # TODO: Figure out a good way to test these things
-        #self.assertEqual(plugin.cache_path, 'asdf')
-        #self.assertEqual(plugin.addon, 'asdf')
+        self.assertTrue(os.path.isdir(plugin.cache_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
+
 
 class TestParseRequest(TestCase):
 

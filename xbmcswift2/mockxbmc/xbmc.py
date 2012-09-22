@@ -1,8 +1,10 @@
 import tempfile
 import os, errno
+from xbmcswift2 import log
 
 
 TEMP_DIR = os.path.join(tempfile.gettempdir(), 'xbmcswift2_debug')
+log.info('Using temp directory %s' % TEMP_DIR)
 
 
 def _create_dir(path):
@@ -46,9 +48,8 @@ def translatePath(path):
     assert len(parts) > 1, 'Need at least a single root directory'
     assert parts[0] in valid_dirs, '%s is not a valid root dir.' % parts[0]
 
-    path = TEMP_DIR
-    for part in parts[:-1]:
-        path = os.path.join(path, part)
-        _create_dir(path)
+    # We don't want to swallow any potential IOErrors here, so only makedir for
+    # the root dir, the user is responsible for making any further child dirs
+    _create_dir(os.path.join(TEMP_DIR, parts[0]))
 
     return os.path.join(TEMP_DIR, *parts)
