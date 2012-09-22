@@ -12,7 +12,11 @@ import xbmcswift2
 
 
 # Ensure we are starting clean by removing old test folders
-shutil.rmtree(TEMP_DIR)
+try:
+    shutil.rmtree(TEMP_DIR)
+except OSError:
+    # doesn't exist, just pass
+    pass
 
 
 @contextmanager
@@ -21,6 +25,7 @@ def preserve_cli_mode(cli_mode):
     xbmcswift2.CLI_MODE = cli_mode
     yield
     xbmcswift2.CLI_MODE = existing
+
 
 class TestInXBMCMode(TestCase):
 
