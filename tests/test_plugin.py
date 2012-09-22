@@ -32,6 +32,7 @@ class TestInit(TestCase):
 
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
+        self.assertEqual(plugin.info_type, 'video')
         self.assertTrue(os.path.isdir(plugin.cache_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
@@ -77,6 +78,30 @@ class TestInit(TestCase):
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
+
+    def test_info_types(self):
+        name = 'Hello XBMC'
+        path = __file__
+
+        # can't parse from id, default to video
+        with preserve_cli_mode(cli_mode=False):
+            with preserve_cwd(os.path.join(os.path.dirname(__file__), 'data', 'plugin')):
+                plugin = Plugin(name, 'script.module.test', path)
+                self.assertEqual(plugin.info_type, 'video')
+
+                # parse from ID
+                plugin = Plugin(name, 'plugin.audio.test')
+                self.assertEqual(plugin.info_type, 'music')
+
+                plugin = Plugin(name, 'plugin.video.test')
+                self.assertEqual(plugin.info_type, 'video')
+
+                plugin = Plugin(name, 'plugin.image.test')
+                self.assertEqual(plugin.info_type, 'pictures')
+
+                # info_type param should override value parsed from id
+                plugin = Plugin(name, 'plugin.video.test', info_type='music')
+                self.assertEqual(plugin.info_type, 'music')
 
 
 class TestParseRequest(TestCase):

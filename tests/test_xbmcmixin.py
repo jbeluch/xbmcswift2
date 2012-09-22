@@ -1,8 +1,11 @@
 import os
+import tempfile
+import xbmcswift2
 from unittest import TestCase
 from mock import Mock, patch, call
 from nose.plugins.skip import SkipTest
 from xbmcswift2.xbmcmixin import XBMCMixin
+from xbmcswift2 import xbmc
 from xbmcswift2.plugin import Plugin
 from xbmcswift2.common import Modes
 from xbmcswift2.listitem import ListItem
@@ -23,6 +26,13 @@ class TestMixedIn(XBMCMixin):
     added_items = []
     handle = 0
     _end_of_directory = False
+
+class MixedIn(XBMCMixin):
+
+    def __init__(self, **kwargs):
+        for attr_name, attr_value in kwargs.items():
+            setattr(self, attr_name, attr_value)
+
 
 class TestXBMCMixin(TestCase):
 
@@ -72,11 +82,38 @@ class TestXBMCMixin(TestCase):
     def test_set_resolved_url(self):
         raise SkipTest('Test not implemented.')
 
-    def test_play_video(self):
-        raise SkipTest('Test not implemented.')
+    @patch.object(xbmc, 'Player')
+    @patch('xbmcswift2.ListItem', wraps=xbmcswift2.ListItem)
+    def test_play_video_dict(self, WrappedListItem, MockPlayer):
+        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         info_type='pictures',
+                         handle=0,
+                         )
 
-    def test_add_items(self):
-        raise SkipTest('Test not implemented.')
+        item = {'label': 'The Ultimate Showdown', 'path': 'http://example.com/video.mp4'}
+        returned = plugin.play_video(item)
+        returned_item = returned[0]
+        self.assertTrue(returned_item.get_played())
+
+        WrappedListItem.from_dict.assert_called_with(
+            label='The Ultimate Showdown',
+            info_type='video',
+            path='http://example.com/video.mp4')
+        self.assertTrue(MockPlayer().play.called)
+
+        # Check that the second arg to play was an instance of xbmc listitem
+        # and not xbmcswift2.ListItem
+        item_arg = MockPlayer().play.call_args[0][1]
+        self.assertTrue(isinstance(item_arg, xbmcswift2.xbmcgui.ListItem))
+
+        # TODO: Implement ListItem.__eq__
+        #MockPlayer().play.assert_called_with('http://example.com/video.mp4', ListItem.from_dict(**item))
+
+    def test_play_video_listitem(self):
+        pass
 
     def test_end_of_directory(self):
         raise SkipTest('Test not implemented.')
@@ -138,6 +175,90 @@ class TestXBMCMixin(TestCase):
         )
 
 
+
+class TestAddItems(TestCase):
+
+    @patch('xbmcswift2.ListItem.from_dict')
+    @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
+    def test_add_items(self, addDirectoryItems, fromDict):
+        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         info_type='pictures',
+                         handle=0,
+                         )
+        items = [
+            {'label': 'Course 1', 'path': 'plugin.image.test/foo'},
+            {'label': 'Course 2', 'path': 'plugin.image.test/bar'},
+        ]
+        returned = plugin.add_items(items)
+
+        # TODO: Assert actual arguments passed to the addDirectoryItems call
+        assert addDirectoryItems.called 
+        calls = [
+            call(label='Course 1', path='plugin.image.test/foo', info_type='pictures'),
+            call(label='Course 2', path='plugin.image.test/bar', info_type='pictures'),
+        ]
+        fromDict.assert_has_calls(calls)
+
+        # TODO: Currently ListItems don't implement __eq__
+        #list_items = [ListItem.from_dict(**item) for item in items]
+        #self.assertEqual(returned, list_items)
+
+    @patch('xbmcswift2.ListItem.from_dict')
+    @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
+    def test_add_items_no_info_type(self, addDirectoryItems, fromDict):
+        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         handle=0,
+                         )
+        items = [
+            {'label': 'Course 1', 'path': 'plugin.image.test/foo'}
+        ]
+        returned = plugin.add_items(items)
+
+        # TODO: Assert actual arguments passed to the addDirectoryItems call
+        assert addDirectoryItems.called 
+        calls = [
+            call(label='Course 1', path='plugin.image.test/foo', info_type='video'),
+        ]
+        fromDict.assert_has_calls(calls)
+
+        # TODO: Currently ListItems don't implement __eq__
+        #list_items = [ListItem.from_dict(**item) for item in items]
+        #self.assertEqual(returned, list_items)
+
+    @patch('xbmcswift2.ListItem.from_dict')
+    @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
+    def test_add_items_item_specific_info_type(self, addDirectoryItems, fromDict):
+        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         handle=0,
+                         info_type='pictures',
+                         )
+        items = [
+            {'label': 'Course 1', 'path': 'plugin.image.test/foo', 'info_type': 'music'}
+        ]
+        returned = plugin.add_items(items)
+
+        # TODO: Assert actual arguments passed to the addDirectoryItems call
+        assert addDirectoryItems.called 
+        calls = [
+            call(label='Course 1', path='plugin.image.test/foo', info_type='music'),
+        ]
+        fromDict.assert_has_calls(calls)
+
+        # TODO: Currently ListItems don't implement __eq__
+        #list_items = [ListItem.from_dict(**item) for item in items]
+        #self.assertEqual(returned, list_items)
+
+
+
 class TestAddToPlaylist(TestCase):
     @patch('xbmcswift2.xbmc.Playlist')
     def setUp(self, mock_Playlist):
@@ -153,28 +274,75 @@ class TestAddToPlaylist(TestCase):
         # Verify playlists
         self.assertRaises(AssertionError, self.m.add_to_playlist, [], 'invalid_playlist')
 
-        # Verify vidoe and music work
+        # Verify video and music work
         self.m.add_to_playlist([])
         self.m.add_to_playlist([], 'video')
         self.m.add_to_playlist([], 'music')
 
-    def test_return_values(self):
+    @patch('xbmcswift2.ListItem', wraps=ListItem)
+    def test_return_values(self, MockListItem):
         # Verify dicts are transformed into listitems
         dict_items = [
             {'label': 'Grape Stomp'},
             {'label': 'Boom Goes the Dynamite'},
         ]
         items = self.m.add_to_playlist(dict_items)
+
+        # Verify from_dict was called properly, defaults to info_type=video
+        calls = [
+            call(label='Grape Stomp', info_type='video'),
+            call(label='Boom Goes the Dynamite', info_type='video'),
+        ]
+        self.assertEqual(MockListItem.from_dict.call_args_list, calls)
+
+
+        ## Verify with playlist=music
+        MockListItem.from_dict.reset_mock()
+
+        dict_items = [
+            {'label': 'Grape Stomp'},
+            {'label': 'Boom Goes the Dynamite'},
+        ]
+        items = self.m.add_to_playlist(dict_items, 'music')
+
+        # Verify from_dict was called properly, defaults to info_type=video
+        calls = [
+            call(label='Grape Stomp', info_type='music'),
+            call(label='Boom Goes the Dynamite', info_type='music'),
+        ]
+        self.assertEqual(MockListItem.from_dict.call_args_list, calls)
+
+        ## Verify an item's info_dict key is not used
+        MockListItem.from_dict.reset_mock()
+
+        dict_items = [
+            {'label': 'Grape Stomp', 'info_type': 'music'},
+            {'label': 'Boom Goes the Dynamite', 'info_type': 'music'},
+        ]
+        items = self.m.add_to_playlist(dict_items, 'video')
+
+        # Verify from_dict was called properly, defaults to info_type=video
+        calls = [
+            call(label='Grape Stomp', info_type='video'),
+            call(label='Boom Goes the Dynamite', info_type='video'),
+        ]
+        self.assertEqual(MockListItem.from_dict.call_args_list, calls)
+
+        # verify ListItems were created correctly
         for item, returned_item in zip(dict_items, items):
             assert isinstance(returned_item, ListItem)
             self.assertEqual(item['label'], returned_item.get_label())
 
-        # Verify listitems are unchange
+        # Verify listitems are unchanged
+        MockListItem.from_dict.reset_mock()
+
         listitems = [
             ListItem('Grape Stomp'),
             ListItem('Boom Goes the Dyanmite'),
         ]
         items = self.m.add_to_playlist(listitems)
+
+        self.assertFalse(MockListItem.from_dict.called)
         for item, returned_item in zip(listitems, items):
             self.assertEqual(item, returned_item)
 

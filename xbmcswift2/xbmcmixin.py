@@ -31,7 +31,10 @@ class XBMCMixin(object):
 
         _end_of_directory = False
 
+        self.handle
 
+    # optional 
+    self.info_type: should be in ['video', 'music', 'pictures']
     _memoized_cache = None
     _unsynced_caches = None
     # TODO: Ensure above is implemented
@@ -130,6 +133,12 @@ class XBMCMixin(object):
         _items = []
         for item in items:
             if not hasattr(item, 'as_xbmc_listitem'):
+                if 'info_type' in item.keys():
+                    log.warning('info_type key has no affect for playlist '
+                                'items as the info_type is inferred from the '
+                                'playlist type.')
+                # info_type has to be same as the playlist type
+                item['info_type'] = playlist
                 item = xbmcswift2.ListItem.from_dict(**item)
             _items.append(item)
             selected_playlist.add(item.get_path(), item.as_xbmc_listitem())
@@ -171,10 +180,12 @@ class XBMCMixin(object):
         return [item]
 
     def play_video(self, item, player=xbmc.PLAYER_CORE_DVDPLAYER):
-        if not isinstance(item, xbmcswift2.ListItem):
+        if not hasattr(item, 'as_xbmc_listitem'):
+            if 'info_type' not in item.keys():
+                item['info_type'] = 'video'
             item = xbmcswift2.ListItem.from_dict(**item)
         item.set_played(True)
-        xbmc.Player(player).play(item.get_path, item)
+        xbmc.Player(player).play(item.get_path(), item.as_xbmc_listitem())
         return [item]
 
     def add_items(self, items):
@@ -190,11 +201,14 @@ class XBMCMixin(object):
         '''
         # For each item if it is not already a list item, we need to create one
         _items = []
+        info_type = self.info_type if hasattr(self, 'info_type') else 'video'
 
         # Create ListItems for anything that is not already an instance of
         # ListItem
         for item in items:
             if not isinstance(item, xbmcswift2.ListItem):
+                if 'info_type' not in item.keys():
+                    item['info_type'] = info_type
                 item = xbmcswift2.ListItem.from_dict(**item)
             _items.append(item)
 
