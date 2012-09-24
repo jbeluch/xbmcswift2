@@ -72,7 +72,7 @@ class Plugin(XBMCMixin):
         # addon_id is no longer required as it can be parsed from addon.xml
         if addon_id:
             self._addon = xbmcaddon.Addon(id=addon_id)
-        elif xbmcswift2.CLI_MODE:
+        else:
             self._addon = xbmcaddon.Addon()
         self._addon_id = addon_id or self._addon.getAddonInfo('id')
 
