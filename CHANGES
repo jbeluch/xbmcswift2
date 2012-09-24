@@ -1,3 +1,9 @@
+0.1.1
+=====
+
+* Fix package data bug. `xbmcswift2 create` should work properly now.
+
+
 0.1
 ===
 
