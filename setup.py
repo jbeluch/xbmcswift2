@@ -53,15 +53,6 @@ setup(
     license = "GPL3",
     keywords = "example documentation tutorial",
     url = 'https://github.com/jbeluch/xbmcswift2',
-    package_data={'xbmcswift2': [
-        'README.md',
-        'cli/data/addon.xml',
-        'cli/data/addon.py',
-        'cli/data/resources/lib/__init__.py',
-        'cli/data/resources/__init__.py',
-        'cli/data/resources/language/English/strings.xml',
-    ]},
-
     packages=find_packages(),
     include_package_data=True,
     long_description=__doc__,
