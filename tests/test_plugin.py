@@ -2,7 +2,6 @@ import os
 import sys
 import shutil
 from unittest import TestCase
-from contextlib import contextmanager
 
 from mock import Mock, patch
 
@@ -10,6 +9,7 @@ from xbmcswift2.mockxbmc.xbmc import TEMP_DIR
 from xbmcswift2 import Plugin
 import xbmcswift2
 
+from utils import preserve_cli_mode, preserve_cwd
 
 # Ensure we are starting clean by removing old test folders
 try:
@@ -19,20 +19,6 @@ except OSError:
     pass
 
 
-@contextmanager
-def preserve_cwd(cwd):
-    existing = os.getcwd()
-    os.chdir(cwd)
-    yield
-    os.chdir(existing)
-
-
-@contextmanager
-def preserve_cli_mode(cli_mode):
-    existing = xbmcswift2.CLI_MODE
-    xbmcswift2.CLI_MODE = cli_mode
-    yield
-    xbmcswift2.CLI_MODE = existing
 
 
 class TestInit(TestCase):
@@ -41,7 +27,8 @@ class TestInit(TestCase):
         name = 'Hello XBMC'
         plugin_id = 'plugin.video.helloxbmc'
         path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
-        plugin = Plugin(name, plugin_id, path)
+        with preserve_cwd(os.path.dirname(path)):
+            plugin = Plugin(name, plugin_id, path)
 
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
@@ -53,10 +40,10 @@ class TestInit(TestCase):
     def test_init_cli_mode_default_args(self):
         name = 'Hello XBMC'
         with preserve_cwd(os.path.join(os.path.dirname(__file__), 'data', 'plugin')):
-            plugin = Plugin(name)
+            plugin = Plugin()
 
         self.assertEqual('plugin.video.academicearth', plugin.id)
-        self.assertEqual(plugin.name, name)
+        self.assertEqual(plugin.name, 'Academic Earth')
         self.assertTrue(os.path.isdir(plugin.cache_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
@@ -66,8 +53,9 @@ class TestInit(TestCase):
         name = 'Hello XBMC'
         plugin_id = 'plugin.video.helloxbmc'
         path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
-        with preserve_cli_mode(cli_mode=False):
-            plugin = Plugin(name, plugin_id, path)
+        with preserve_cwd(os.path.dirname(path)):
+            with preserve_cli_mode(cli_mode=False):
+                plugin = Plugin(name, plugin_id, path)
 
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
@@ -81,10 +69,10 @@ class TestInit(TestCase):
         path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
         with preserve_cli_mode(cli_mode=False):
             with preserve_cwd(os.path.join(os.path.dirname(__file__), 'data', 'plugin')):
-                plugin = Plugin(name)
+                plugin = Plugin()
 
         self.assertEqual('plugin.video.academicearth', plugin.id)
-        self.assertEqual(plugin.name, name)
+        self.assertEqual(plugin.name, 'Academic Earth')
         self.assertTrue(os.path.isdir(plugin.cache_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
@@ -97,7 +85,8 @@ class TestParseRequest(TestCase):
         name = 'Hello XBMC'
         plugin_id = 'plugin.video.helloxbmc'
         path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
-        self.plugin = Plugin(name, plugin_id, path)
+        with preserve_cwd(os.path.dirname(path)):
+            self.plugin = Plugin(name, plugin_id, path)
 
     def test_parse_request(self):
         with patch('xbmcswift2.plugin.Request') as MockRequest:
@@ -130,7 +119,8 @@ def NewPlugin():
     name = 'Hello XBMC'
     plugin_id = 'plugin.video.helloxbmc'
     path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
-    return Plugin(name, plugin_id, path)
+    with preserve_cwd(os.path.dirname(path)):
+        return Plugin(name, plugin_id, path)
 
 def _TestPluginRunner(plugin):
     def run(relative_url, handle=0, qs='?'):

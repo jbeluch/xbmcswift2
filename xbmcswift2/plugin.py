@@ -64,8 +64,7 @@ class Plugin(XBMCMixin):
                      testing.
     '''
 
-    def __init__(self, name, addon_id=None, filepath=None):
-        self._name = name
+    def __init__(self, name=None, addon_id=None, filepath=None):
         self._routes = []
         self._view_functions = {}
 
@@ -74,7 +73,9 @@ class Plugin(XBMCMixin):
             self._addon = xbmcaddon.Addon(id=addon_id)
         else:
             self._addon = xbmcaddon.Addon()
+
         self._addon_id = addon_id or self._addon.getAddonInfo('id')
+        self._name = name or self._addon.getAddonInfo('name')
 
         # Keeps track of the added list items
         self._current_items = []

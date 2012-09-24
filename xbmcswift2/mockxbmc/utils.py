@@ -19,3 +19,10 @@ def get_addon_id(addonxml):
     xml = parse(addonxml)
     addon_node = xml.getElementsByTagName('addon')[0]
     return addon_node.getAttribute('id')
+
+
+def get_addon_name(addonxml):
+    '''Parses an addon name from the given addon.xml filename.'''
+    xml = parse(addonxml)
+    addon_node = xml.getElementsByTagName('addon')[0]
+    return addon_node.getAttribute('name')

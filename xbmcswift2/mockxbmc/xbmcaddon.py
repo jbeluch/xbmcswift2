@@ -8,7 +8,10 @@ class Addon(object):
         # In CLI mode, xbmcswift2 must be run from the root of the addon
         # directory, so we can rely on getcwd() being correct.
         addonxml = os.path.join(os.getcwd(), 'addon.xml')
-        self._id = id or utils.get_addon_id(addonxml)
+        self._info = {
+            'id': id or utils.get_addon_id(addonxml),
+            'name': utils.get_addon_name(addonxml),
+        }
         self._strings = {}
         self._settings = {}
         
@@ -18,9 +21,7 @@ class Addon(object):
             'fanart', 'icon', 'id', 'name', 'path', 'profile', 'stars', 'summary',
             'type', 'version']
         assert id in properties, '%s is not a valid property.' % id
-        if id == 'id':
-            return self._id
-        return 'Unavailable'
+        return self._info.get(id, 'Unavailable')
 
     def getLocalizedString(self, id):
         key = str(id)
