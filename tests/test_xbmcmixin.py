@@ -82,6 +82,25 @@ class TestXBMCMixin(TestCase):
     def test_finish(self):
         raise SkipTest('Test not implemented.')
 
+    @patch('xbmcswift2.xbmc.executebuiltin')
+    def test_notify_defalt_name(self, mockExecutebuiltin):
+        plugin = TestMixedIn()
+        with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
+            plugin.notify('Hello World!')
+        mockExecutebuiltin.assert_called_with(
+            'XBMC.Notification("Hello World!", "Academic Earth", "5000", "")'
+        )
+
+    @patch('xbmcswift2.xbmc.executebuiltin')
+    def test_notify(self, mockExecutebuiltin):
+        plugin = TestMixedIn()
+        with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
+            plugin.notify('Hello World!', 'My Title', 3000, 'http://example.com/image.png')
+        mockExecutebuiltin.assert_called_with(
+                'XBMC.Notification("Hello World!", "My Title", "3000", "http://example.com/image.png")'
+        )
+
+
 class TestAddToPlaylist(TestCase):
     @patch('xbmcswift2.xbmc.Playlist')
     def setUp(self, mock_Playlist):

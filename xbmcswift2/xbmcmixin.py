@@ -23,11 +23,11 @@ class XBMCMixin(object):
         # exists.
         self.cache_path  
 
-        self.addon
-
         self.added_items
 
         self.request
+
+        self.addon
 
     _end_of_directory = False
     _memoized_cache = None
@@ -158,7 +158,7 @@ class XBMCMixin(object):
         if not msg:
             log.warning('Empty message for notification dialog')
         if title is None:
-            title = self.plugin.name
+            title = self.addon.getAddonInfo('name')
         xbmc.executebuiltin('XBMC.Notification("%s", "%s", "%s", "%s")' %
                             (msg, title, delay, image))
 
