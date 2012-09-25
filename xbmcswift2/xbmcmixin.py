@@ -9,7 +9,7 @@ import xbmcswift2
 from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
 from xbmcswift2.cache import Cache, TimedCache
 from xbmcswift2.logger import log
-from xbmcswift2.constants import VIEW_MODES
+from xbmcswift2.constants import VIEW_MODES, SortMethod
 from common import Modes, DEBUG_MODES
 from request import Request
 
@@ -29,7 +29,9 @@ class XBMCMixin(object):
 
         self.addon
 
-    _end_of_directory = False
+        _end_of_directory = False
+
+
     _memoized_cache = None
     _unsynced_caches = None
     # TODO: Ensure above is implemented
@@ -244,6 +246,10 @@ class XBMCMixin(object):
             self.add_items(items)
         if sort_methods:
             for sort_method in sort_methods:
+                try:
+                    sort_method = SortMethod.from_string(sort_method)
+                except AttributeError:
+                    pass
                 xbmcplugin.addSortMethod(self.handle, sort_method)
 
         # Attempt to set a view_mode if given

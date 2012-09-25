@@ -20,6 +20,8 @@ class module(ModuleType):
 
     def __init__(self, wrapped=None):
         self.wrapped = wrapped
+        if wrapped:
+            self.__dict__.update(wrapped.__dict__)
 
     def __getattr__(self, name):
         '''Returns any existing attr for the wrapped module or returns a mock

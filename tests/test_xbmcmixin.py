@@ -1,12 +1,13 @@
 import os
 from unittest import TestCase
-from mock import Mock, patch
+from mock import Mock, patch, call
 from nose.plugins.skip import SkipTest
 from xbmcswift2.xbmcmixin import XBMCMixin
 from xbmcswift2.plugin import Plugin
 from xbmcswift2.common import Modes
 from xbmcswift2.listitem import ListItem
 from xbmcswift2.mockxbmc.xbmcaddon import Addon
+from xbmcswift2 import SortMethod
 
 
 TEST_STRINGS_FN = os.path.join(os.path.dirname(__file__), 'data', 'strings.xml')
@@ -21,6 +22,7 @@ class TestMixedIn(XBMCMixin):
     addon = Mock()
     added_items = []
     handle = 0
+    _end_of_directory = False
 
 class TestXBMCMixin(TestCase):
 
@@ -79,8 +81,23 @@ class TestXBMCMixin(TestCase):
     def test_end_of_directory(self):
         raise SkipTest('Test not implemented.')
 
-    def test_finish(self):
-        raise SkipTest('Test not implemented.')
+    @patch('xbmcswift2.xbmcplugin.addSortMethod')
+    def test_finish(self, mockAddSortMethod):
+        # TODO: Add more asserts to this test
+        items = [
+            {'label': 'Foo', 'path': 'http://example.com/foo'},
+            {'label': 'Bar', 'path': 'http://example.com/bar'},
+        ]
+        plugin = TestMixedIn()
+        resp = plugin.finish(items, sort_methods=['title', 'label', 'mpaa_rating', SortMethod.SIZE])
+        calls = [
+            call(0, 9),
+            call(0, 1),
+            call(0, 28),
+            call(0, 4),
+        ]
+        mockAddSortMethod.assert_has_calls(calls)
+
 
     @patch('xbmcswift2.xbmc.executebuiltin')
     def test_notify_defalt_name(self, mockExecutebuiltin):
