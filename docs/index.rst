@@ -15,23 +15,39 @@ complete :ref:`api` reference. For more specific examples, check out
 :ref:`upgrading` page.
 
 XBMC Swift doesn't rely on any external dependencies to get started. However,
-when writing plugins I like to use <http://BeautifulSoup.org>. Also, when it
-comes to advanced testing of plugins, I like to use <http://nosetests.org>.
+when writing plugins I like to use http://BeautifulSoup.org. Also, when it
+comes to advanced testing of plugins, I like to use http://nosetests.org.
 
 For a list of XBMC addons which use xbmcswift2, see :ref:`poweredby`.
 
 
-
-Contents:
+Basic Info
+----------
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
+
+    installation
+    quickstart
+    tutorial
+    commandline
+    patterns
 
 
-Indices and tables
-==================
+API Reference
+-------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+    :maxdepth: 2
 
+    api
+
+
+Other Notes
+-----------
+
+.. toctree::
+    :maxdepth: 2
+
+    upgrading
+    poweredby
