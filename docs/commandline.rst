@@ -8,7 +8,7 @@ Running Addons on the Command Line
 Options
 -------
 
-To see the command line help, simply execute `xbmcswift2 run -h`.::
+To see the command line help, simply execute ``xbmcswift2 run -h``.::
 
     $ xbmcswift2 run -h
     Usage: xbmcswift2 run [once|interactive|crawl] [url]
