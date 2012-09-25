@@ -68,16 +68,21 @@ find an ``addon.py`` exactly like the one below.
 
 .. sourcecode:: python
 
-    #!/usr/bin/env python
     from xbmcswift2 import Plugin
 
-    PLUGIN_NAME = 'Hello XBMC'
-    plugin = Plugin(PLUGIN_NAME)
+
+    plugin = Plugin()
+
 
     @plugin.route('/')
     def index():
-        item = {'label': 'Hello XBMC!'}
+        item = {
+            'label': 'Hello XBMC!',
+            'path': 'http://s3.amazonaws.com/KA-youtube-converted/JwO_25S_eWE.mp4/JwO_25S_eWE.mp4',
+            'is_playable': True
+        }
         return [item]
+
 
     if __name__ == '__main__':
         plugin.run()
@@ -85,10 +90,8 @@ find an ``addon.py`` exactly like the one below.
 The above code is a fully functioning XBMC addon (not that it does much!). So
 what does the code do?
 
-1. After importing the Plugin class, we create our plugin instance. The
-   arguments are, ``addon name``, ``addon id`` (ids should be according to
-   XBMC's documentation <http://here>). The third argument is the actual
-   filepath, which xbmcswift2 uses for some functionality behind the scenes.
+1. After importing the Plugin class, we create our plugin instance. xbmcswift
+   will parse the proper addon name and id from the addon.xml file.
 
 2. We are using the ``plugin.route`` decorator on the ``index`` function. This
    binds a url path of '/' to the index function. ('/' is the default URL
@@ -97,12 +100,17 @@ what does the code do?
    Note: The url rule of '/' must always exist in a plugin. This is the default
    route when a plugin is first run.
 
-3. The index function creates a dictionary with a single key/val pair,
-   ``label``. In the simplest form of a plugin, we can just return a list of
-   dictionaries containing the values to be translated to list items. Note that
-   for xbmcswift2 to function properly, we must always return a list of items.
+3. The index function creates a single dict with some key/vals. This is how you
+   create a listitem using xbmcswift2. At a minimum, most items have a ``path``
+   and ``label``. The ``is_playable`` flag tells XBMC that this is a media
+   item, and not a URL which points back to an addon.
 
-4. We call ``plugin.run()`` to run our plugin.
+4. We return a list from the index function, that contains a single item. For a
+   typical xbmcswift2 view, this is the proper way to add list items.
+
+5. We call ``plugin.run()`` to run our plugin. It is imperative that this line
+   is inside the ``__name__`` guard. If it is not, your addon won't run
+   correctly on the command line.
 
 
 Running Addons from the Command Line
@@ -126,6 +134,8 @@ Right away we can see the output of our plugin. When running in the CLI,
 xbmcswift2 prints log messages to STDERR, so you can hide them by appending
 ``2>/dev/null`` to the previous command.. Below the logs we can see a simple
 display of our listitems, in this case a single item.
+
+See :ref:`commandline` for a more detailed explanation of running on the command line.
 
 
 URL Routing
