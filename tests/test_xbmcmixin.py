@@ -82,6 +82,25 @@ class TestXBMCMixin(TestCase):
         raise SkipTest('Test not implemented.')
 
     @patch('xbmcswift2.xbmcplugin.addSortMethod')
+    def test_add_sort_method(self, addSortMethod):
+        plugin = TestMixedIn()
+
+        known_values = [
+            # can specify by string
+            ( ('title', None), (0, 9) ),
+            ( ('TiTLe', None), (0, 9) ),
+            # can specify as an attr on the SortMethod class
+            ( (SortMethod.TITLE, None), (0, 9) ),
+            ( ('date', '%D'), (0, 3, '%D') ),
+            # can specify with the actual int value
+            ( (3, '%D'), (0, 3, '%D') ),
+        ]
+
+        for args, call_args_to_verify in known_values:
+            plugin.add_sort_method(*args)
+            addSortMethod.assert_called_with(*call_args_to_verify)
+
+    @patch('xbmcswift2.xbmcplugin.addSortMethod')
     def test_finish(self, mockAddSortMethod):
         # TODO: Add more asserts to this test
         items = [
@@ -89,9 +108,10 @@ class TestXBMCMixin(TestCase):
             {'label': 'Bar', 'path': 'http://example.com/bar'},
         ]
         plugin = TestMixedIn()
-        resp = plugin.finish(items, sort_methods=['title', 'label', 'mpaa_rating', SortMethod.SIZE])
+        resp = plugin.finish(items, sort_methods=['title', ('dAte', '%D'), 'label', 'mpaa_rating', SortMethod.SIZE])
         calls = [
             call(0, 9),
+            call(0, 3, '%D'),
             call(0, 1),
             call(0, 28),
             call(0, 4),

@@ -223,19 +223,56 @@ class XBMCMixin(object):
                                              update_listing, cache_to_disc)
         assert False, 'Already called endOfDirectory.'
 
+    def add_sort_method(self, sort_method, label2_mask=None):
+        '''A wrapper for `xbmcplugin.addSortMethod()
+        <http://mirrors.xbmc.org/docs/python-docs/xbmcplugin.html#-addSortMethod>`_.
+        You can use ``dir(xbmcswift2.SortMethod)`` to list all available sort
+        methods.
+
+        :param sort_method: A valid sort method. You can provided the constant
+                            from xbmcplugin, an attribute of SortMethod, or a
+                            string name. For instance, the following method
+                            calls are all equivalent:
+        
+                            * ``plugin.add_sort_method(xbmcplugin.SORT_METHOD_TITLE)``
+                            * ``plugin.add_sort_metohd(SortMethod.TITLE)``
+                            * ``plugin.add_sort_method('title')``
+        :param label2_mask: A mask pattern for label2. See the `XBMC
+                            documentation
+                            <http://mirrors.xbmc.org/docs/python-docs/xbmcplugin.html#-addSortMethod>`_
+                            for more information.
+        '''
+        try:
+            # Assume it's a string and we need to get the actual int value
+            sort_method = SortMethod.from_string(sort_method)
+        except AttributeError:
+            # sort_method was already an int (or a bad value)
+            pass
+
+        if label2_mask:
+            xbmcplugin.addSortMethod(self.handle, sort_method, label2_mask)
+        else:
+            xbmcplugin.addSortMethod(self.handle, sort_method)
+
     def finish(self, items=None, sort_methods=None, succeeded=True,
                update_listing=False, cache_to_disc=True, view_mode=None):
-        '''Adds the provided items to the XBMC interface. Each item in
-        the provided list should either be an instance of
-        xbmcswift2.ListItem or a dictionary that will be passed to
-        xbmcswift2.ListItem.from_dict().
+        '''Adds the provided items to the XBMC interface. 
 
         :param items: an iterable of items where each item is either a
             dictionary with keys/values suitable for passing to
             :meth:`xbmcswift2.ListItem.from_dict` or an instance of
             :class:`xbmcswift2.ListItem`.
-        :param sort_methods: a list of valid XBMC sort_methods. See
-            :attr:`xbmcswift2.SortMethod`.
+        :param sort_methods: a list of valid XBMC sort_methods. Each item in
+                             the list can either be a sort method or a tuple of
+                             ``sort_method, label2_mask``. See
+                             :meth:`add_sort_method` for
+                             more detail concerning valid sort_methods.
+
+                             Example call with sort_methods::
+
+                                sort_methods = ['label', 'title', ('date', '%D')]
+                                plugin.finish(items, sort_methods=sort_methods)
+                                
         :param view_mode: can either be an integer (or parseable integer
             string) corresponding to a view_mode or the name of a type of view.
             Currrently the only view type supported is 'thumbnail'.
@@ -246,11 +283,10 @@ class XBMCMixin(object):
             self.add_items(items)
         if sort_methods:
             for sort_method in sort_methods:
-                try:
-                    sort_method = SortMethod.from_string(sort_method)
-                except AttributeError:
-                    pass
-                xbmcplugin.addSortMethod(self.handle, sort_method)
+                if not isinstance(sort_method, basestring) and hasattr(sort_method, '__len__'):
+                    self.add_sort_method(*sort_method)
+                else: 
+                    self.add_sort_method(sort_method)
 
         # Attempt to set a view_mode if given
         if view_mode is not None:
