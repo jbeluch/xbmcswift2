@@ -99,11 +99,11 @@ class Plugin(XBMCMixin):
         # The plugin's named logger
         self._log = setup_log(addon_id)
 
-        # The path to the cache directory for the addon
-        self._cache_path = xbmc.translatePath(
-            'special://profile/addon_data/%s/.cache/' % self._addon_id)
-        if not os.path.isdir(self._cache_path):
-            os.makedirs(self._cache_path)
+        # The path to the storage directory for the addon
+        self._storage_path = xbmc.translatePath(
+            'special://profile/addon_data/%s/.storage/' % self._addon_id)
+        if not os.path.isdir(self._storage_path):
+            os.makedirs(self._storage_path)
 
         # If we are runing in CLI, we need to load the strings.xml manually
         # Since xbmcswift2 currently relies on execution from an addon's root
@@ -141,9 +141,9 @@ class Plugin(XBMCMixin):
         return self._addon_id
 
     @property
-    def cache_path(self):
-        '''A full path to the cache folder for this plugin's addon data.'''
-        return self._cache_path
+    def storage_path(self):
+        '''A full path to the storage folder for this plugin's addon data.'''
+        return self._storage_path
 
     @property
     def addon(self):
@@ -221,7 +221,7 @@ class Plugin(XBMCMixin):
         '''A decorator to add a route to a view and also apply caching.
         '''
         route_decorator = self.route(url_rule, name=name, options=options)
-        cache_decorator = self.cache()
+        cache_decorator = self.cached()
         def new_decorator(func):
             return route_decorator(cache_decorator(func))
         return new_decorator

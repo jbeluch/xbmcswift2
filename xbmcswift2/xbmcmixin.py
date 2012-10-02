@@ -7,7 +7,7 @@ from functools import wraps
 
 import xbmcswift2
 from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
-from xbmcswift2.cache import Cache, TimedCache
+from xbmcswift2.storage import TimedStorage
 from xbmcswift2.logger import log
 from xbmcswift2.constants import VIEW_MODES, SortMethod
 from common import Modes, DEBUG_MODES
@@ -21,7 +21,7 @@ class XBMCMixin(object):
 
         # Also, the child class is responsible for ensuring that this path
         # exists.
-        self.cache_path  
+        self.storage_path  
 
         self.added_items
 
@@ -35,17 +35,24 @@ class XBMCMixin(object):
 
     # optional 
     self.info_type: should be in ['video', 'music', 'pictures']
-    _memoized_cache = None
-    _unsynced_caches = None
+    _memoized_storage = None
+    _unsynced_storages = None
     # TODO: Ensure above is implemented
     '''
-    def cache(self, ttl_hours=24):
-        '''View caching decorator. Currently must be closest to the
-        view because route decorators don't wrap properly.
+    def cached(self, TTL=60 * 24):
+        '''A decorator that will cache the output of the wrapped function. The
+        key used for the cache is the function name as well as the `*args` and
+        `**kwargs` passed to the function.
+
+        :param TTL: time to live in minutes
+
+        .. note:: For route caching, you should use
+                  :meth:`xbmcswift2.Plugin.cached_route`.
         '''
         def decorating_function(function):
-            cache = self.get_timed_cache('function_cache', file_format='pickle',
-                                         ttl=timedelta(hours=ttl_hours))
+            # TODO test this method
+            storage = self.get_storage('.functions', file_format='pickle',
+                                       ttl=timedelta(hours=ttl_hours))
             kwd_mark = 'f35c2d973e1bbbc61ca60fc6d7ae4eb3'
 
             @wraps(function)
@@ -55,39 +62,68 @@ class XBMCMixin(object):
                     key += (kwd_mark,) + tuple(sorted(kwargs.items()))
 
                 try:
-                    result = cache[key]
+                    result = storage[key]
                     #log.debug('Cache hit for key "%s"' % (key, ))
-                    log.debug('Cache hit for function "%s" with args "%s" and kwargs "%s"' % (function.__name__, args, kwargs))
+                    log.debug('Storage hit for function "%s" with args "%s" '
+                              'and kwargs "%s"' % (function.__name__, args,
+                                                   kwargs))
                 except KeyError:
-                    log.debug('Cache miss for function "%s" with args "%s" and kwargs "%s"' % (function.__name__, args, kwargs))
+                    log.debug('Storage miss for function "%s" with args "%s" '
+                              'and kwargs "%s"' % (function.__name__, args,
+                                                   kwargs))
                     result = function(*args, **kwargs)
-                    cache[key] = result
-                cache.sync()
+                    storage[key] = result
+                storage.sync()
                 return result
             return wrapper
         return decorating_function
 
-    def _get_cache(self, cache_type, cache_name, **kwargs):
-        if not hasattr(self, '_unsynced_caches'):
-            self._unsynced_caches = {}
-        filename = os.path.join(self.cache_path, cache_name)
+    def list_storages(self):
+        '''Returns a list of existing stores. The returned names can then be
+        used to call get_storage().
+        '''
+        # Filter out any storages used by xbmcswift2 so caller doesn't corrupt
+        # them.
+        return [name for name in os.listdir(self.storage_path)
+                if not name.startswith('.')]
+
+    def get_storage(self, name='main', file_format='pickle', TTL=None):
+        '''Returns a storage for the given name. The returned storage is a
+        fully functioning python dictionary and is designed to be used that
+        way. It is usually not necessary for the caller to load or save the
+        storage manually. If the storage does not already exist, it will be
+        created.  
+
+        .. seealso:: :class:`xbmcswift2.TimedStorage` for more details.
+
+        :param name: The name  of the storage to retrieve.
+        :param file_format: Choices are 'pickle', 'csv', and 'json'. Pickle is
+                            recommended as it supports python objects.
+
+                            .. note:: If a storage already exists for the given
+                                      name, the file_format parameter is
+                                      ignored. The format will be determined by
+                                      the existing storage file.
+        :param TTL: The time to live for storage items specified in hours or None
+                    for no expiration. Since storage items aren't expired until a
+                    storage is loaded form disk, it is possible to call
+                    get_storage() with a different TTL than when the storage was
+                    created. The currently specified TTL is always honored.
+        '''
+
+        if not hasattr(self, '_unsynced_storages'):
+            self._unsynced_storages = {}
+        filename = os.path.join(self.storage_path, name)
         try:
-            cache = self._unsynced_caches[filename]
-            log.debug('Used live cache "%s" located at "%s"' % (cache_name, filename))
+            storage = self._unsynced_storages[filename]
+            log.debug('Loaded storage "%s" from memory' % name)
         except KeyError:
-            cache = cache_type(filename, **kwargs)
-            self._unsynced_caches[filename] = cache
-            log.debug('Used cold cache "%s" located at "%s"' % (cache_name, filename))
-        return cache
-
-    def get_timed_cache(self, cache_name, file_format='pickle', ttl=None):
-        return self._get_cache(TimedCache, cache_name, file_format=file_format, ttl=ttl)
-
-    def get_cache(self, cache_name, file_format='pickle'):
-        return self._get_cache(TimedCache, cache_name, file_format=file_format)
-
-    def cache_fn(self, path):
-        return os.path.join(self.cache_path, path)
+            if TTL:
+                TTL = timedelta(minutes=TTL)
+            storage = TimedStorage(filename, file_format, TTL)
+            self._unsynced_storages[filename] = storage
+            log.debug('Loaded storage "%s" from disk' % name)
+        return storage
 
     def temp_fn(self, path):
         return os.path.join(xbmc.translatePath('special://temp/'), path)
@@ -317,11 +353,11 @@ class XBMCMixin(object):
         # Finalize the directory items
         self.end_of_directory(succeeded, update_listing, cache_to_disc)
 
-        # Close any open caches which will persist them to disk
-        if hasattr(self, '_unsynced_caches'):
-            for cache in self._unsynced_caches.values():
-                log.debug('Saving a %s cache to disk at "%s"' % (cache.file_format, cache.filename))
-                cache.close()
+        # Close any open storages which will persist them to disk
+        if hasattr(self, '_unsynced_storages'):
+            for storage in self._unsynced_storages.values():
+                log.debug('Saving a %s storage to disk at "%s"' % (storage.file_format, storage.filename))
+                storage.close()
 
         # Return the cached list of all the list items that were added
         return self.added_items

@@ -17,9 +17,9 @@ TEST_STRINGS_FN = os.path.join(os.path.dirname(__file__), 'data', 'strings.xml')
 
 
 class TestMixedIn(XBMCMixin):
-    cache_path = '/tmp/cache'
-    if not os.path.isdir(cache_path):
-       os.mkdir(cache_path)
+    storage_path = '/tmp/cache'
+    if not os.path.isdir(storage_path):
+       os.mkdir(storage_path)
     # TODO: use a mock with return values here
     #addon = Addon('plugin.video.helloxbmc')
     addon = Mock()
@@ -39,22 +39,17 @@ class TestXBMCMixin(TestCase):
     def setUp(self):
         self.m = TestMixedIn()
 
-        # set fake return value of raddon.kj
-
-    def test_cache_fn(self):
-        self.assertEqual('/tmp/cache/cached_file', self.m.cache_fn('cached_file'))
-
     def test_temp_fn(self):
         # TODO: This test relies on hardcoded paths, fix to limit test coverage
         # TODO: This test relies on hardcoded paths which are not the same across different OS
         #self.assertEqual('/tmp/xbmcswift2_debug/temp/temp_file', self.m.temp_fn('temp_file'))
         raise SkipTest('Test not implemented.')
 
-    def test_get_cache(self):
-        cache = self.m.get_cache('animals')
+    def test_get_storage(self):
+        cache = self.m.get_storage('animals')
         cache['dog'] = 'woof'
         cache.close()
-        cache = self.m.get_cache('animals')
+        cache = self.m.get_storage('animals')
         self.assertEqual(cache['dog'], 'woof')
 
     def test_get_string(self):
@@ -85,7 +80,7 @@ class TestXBMCMixin(TestCase):
     @patch.object(xbmc, 'Player')
     @patch('xbmcswift2.ListItem', wraps=xbmcswift2.ListItem)
     def test_play_video_dict(self, WrappedListItem, MockPlayer):
-        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
                          addon=Mock(),
                          added_items=[],
                          request=Mock(),
@@ -181,7 +176,7 @@ class TestAddItems(TestCase):
     @patch('xbmcswift2.ListItem.from_dict')
     @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
     def test_add_items(self, addDirectoryItems, fromDict):
-        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
                          addon=Mock(),
                          added_items=[],
                          request=Mock(),
@@ -209,7 +204,7 @@ class TestAddItems(TestCase):
     @patch('xbmcswift2.ListItem.from_dict')
     @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
     def test_add_items_no_info_type(self, addDirectoryItems, fromDict):
-        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
                          addon=Mock(),
                          added_items=[],
                          request=Mock(),
@@ -234,7 +229,7 @@ class TestAddItems(TestCase):
     @patch('xbmcswift2.ListItem.from_dict')
     @patch('xbmcswift2.xbmcplugin.addDirectoryItems')
     def test_add_items_item_specific_info_type(self, addDirectoryItems, fromDict):
-        plugin = MixedIn(cache_path=tempfile.mkdtemp(),
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
                          addon=Mock(),
                          added_items=[],
                          request=Mock(),

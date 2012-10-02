@@ -33,7 +33,7 @@ class TestInit(TestCase):
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
         self.assertEqual(plugin.info_type, 'video')
-        self.assertTrue(os.path.isdir(plugin.cache_path))
+        self.assertTrue(os.path.isdir(plugin.storage_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
@@ -45,7 +45,7 @@ class TestInit(TestCase):
 
         self.assertEqual('plugin.video.academicearth', plugin.id)
         self.assertEqual(plugin.name, 'Academic Earth')
-        self.assertTrue(os.path.isdir(plugin.cache_path))
+        self.assertTrue(os.path.isdir(plugin.storage_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
@@ -60,7 +60,7 @@ class TestInit(TestCase):
 
         self.assertEqual(plugin_id, plugin.id)
         self.assertEqual(plugin.name, name)
-        self.assertTrue(os.path.isdir(plugin.cache_path))
+        self.assertTrue(os.path.isdir(plugin.storage_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
@@ -74,7 +74,7 @@ class TestInit(TestCase):
 
         self.assertEqual('plugin.video.academicearth', plugin.id)
         self.assertEqual(plugin.name, 'Academic Earth')
-        self.assertTrue(os.path.isdir(plugin.cache_path))
+        self.assertTrue(os.path.isdir(plugin.storage_path))
         self.assertEqual(plugin.added_items, [])
         self.assertRaises(Exception, getattr, plugin, 'handle')
         self.assertRaises(Exception, getattr, plugin, 'request')
