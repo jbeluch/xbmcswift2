@@ -141,6 +141,16 @@ def print_email(addon_id, version, git_url, tag, xbmc_version):
     for line in lines:
         puts(colors.cyan(line))
 
+@task
+def local_release(xbmc_version=None):
+    if xbmc_version is None:
+        abort('Must specify an XBMC version, [dharma, eden]')
+    xbmc_version = xbmc_version.upper()
+    if xbmc_version not in BRANCHES.keys():
+        abort('Invalid XBMC version, [dharma, eden]')
+
+    path = release_prepare(xbmc_version)
+    print 'Development release created at %s' % path
 
 @task
 def release(xbmc_version=None):
@@ -150,7 +160,8 @@ def release(xbmc_version=None):
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    release_prepare(xbmc_version)
+    dist_path = release_prepare(xbmc_version)
+    release_perform(xbmc_version, dist_path)
 
 
 def release_prepare(xbmc_version):
@@ -201,20 +212,22 @@ def release_prepare(xbmc_version):
     # if user doesn't want to continue they shouldu be able to :cq
     returncode = subprocess.check_call([EDITOR, changelog])
 
+    # return path to new dist repo
+    return dist_path
+
+
+def release_perform(xbmc_version, dist_path):
+    dist_repo = GitRepo(path=dist_path)
+
     # Stage everything in the repo
     log('Staging all modified files in the distribution repo...')
     dist_repo.stage_all()
 
-    release_perform(xbmc_version, dist_path)
-
-
-def release_perform(xbmc_version, dist_path):
     # Get the current XBMC version
     version = get_addon_version(dist_path)
 
     # Commit all staged changes and tag
     log('Commiting changes and tagging the release...')
-    dist_repo = GitRepo(path=dist_path)
     dist_repo.commit(version)
     dist_repo.tag(version, xbmc_version.lower())
 

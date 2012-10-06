@@ -2,6 +2,7 @@ import os
 import sys
 from unittest import TestCase
 from xbmcswift2 import Module, Plugin, NotFoundException
+from utils import preserve_cwd
 
 
 TEST_STRINGS_FN = os.path.join(os.path.dirname(__file__), 'data', 'strings.xml')
@@ -10,7 +11,9 @@ TEST_STRINGS_FN = os.path.join(os.path.dirname(__file__), 'data', 'strings.xml')
 def create_plugin_module():
         module = Module('namespace')
         sys.argv = ['./addon.py']
-        plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', __file__)
+        path = os.path.join(os.path.dirname(__file__), 'data', 'plugin', 'addon.py')
+        with preserve_cwd(os.path.dirname(path)):
+            plugin = Plugin('Hello XBMC', 'plugin.video.helloxbmc', path)
         return plugin, module
 
 

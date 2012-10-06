@@ -53,17 +53,17 @@ to ensure a different cache entry is created.
 Storing Arbitrary Objects
 `````````````````````````
 
-You can always create your own cache using :meth:`~xbmcswift2.Plugin.get_cache`
-or :meth:`~xbmcswift2.Plugin.get_timed_cache`. The returned cache acts like a
+You can always create your own persistent storage using
+:meth:`~xbmcswift2.Plugin.get_storage`. The returned storage acts like a
 dictionary, however it is automatically persisted to disk.
 
 .. sourcecode:: python
 
-    cache = plugin.get_cache('people')
-    cache['jon'] = {'vehicle': 'bike'}
-    cache['dave']      # Throws KeyError
-    cache.get('dave')  # Returns None
-    cache.clear()      # Clears all items from the cache
+    storage = plugin.get_storage('people')
+    storage['jon'] = {'vehicle': 'bike'}
+    storage['dave']      # Throws KeyError
+    storage.get('dave')  # Returns None
+    storage.clear()      # Clears all items from the storage
 
 Adding pagination
 -----------------
@@ -123,12 +123,6 @@ how to use settings
 
 Using the context menu
 ----------------------
-
-
-Using the plugin cache
-----------------------
-
-store arbiratry files in plugin cache
 
 
 Pickling parameters in URls

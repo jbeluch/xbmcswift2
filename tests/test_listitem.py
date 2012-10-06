@@ -1,4 +1,4 @@
-from unittest2 import TestCase
+from unittest import TestCase
 from xbmcswift2 import xbmcgui, ListItem
 from mock import Mock, patch
 
@@ -169,6 +169,7 @@ class TestFromDict(TestCase):
             'path': 'plugin://my.plugin.id/',
             'selected': True,
             'info': {'title': 'My title'},
+            'info_type': 'pictures',
             'properties': [('StartOffset', '256.4')],
             'context_menu': [('label', 'action')],
             'is_playable': True}
@@ -180,8 +181,14 @@ class TestFromDict(TestCase):
         self.assertEqual(item.thumbnail, 'thumbnail')
         self.assertEqual(item.path, 'plugin://my.plugin.id/')
         self.assertEqual(item.selected, True)
-        mock_set_info.assert_called_with('video', {'title': 'My title'})
+        mock_set_info.assert_called_with('pictures', {'title': 'My title'})
         self.assertEqual(item.get_property('StartOffset'), '256.4')
         self.assertEqual(item.get_context_menu_items(), [('label', 'action')]) 
         self.assertEqual(item.get_property('isPlayable'), 'true')
         self.assertEqual(item.is_folder, False)
+
+    def test_from_dict_info_default_info_type(self):
+        dct = {'info': {'title': 'My title'}}
+        with patch.object(ListItem, 'set_info', spec=True) as mock_set_info:
+            item = ListItem.from_dict(**dct)
+        mock_set_info.assert_called_with('video', {'title': 'My title'})

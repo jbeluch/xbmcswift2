@@ -38,7 +38,7 @@ Contact
 
 https://github.com/jbeluch/xbmcswift2
 
-xbmc@jonathanbeluch.com
+web@jonathanbeluch.com
 '''
 import os
 from setuptools import setup, find_packages
@@ -46,7 +46,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'xbmcswift2',
-    version = '0.1.1',
+    version = '0.2',
     author = 'Jonathan Beluch',
     author_email = 'web@jonathanbeluch.com',
     description = 'A micro framework for rapid development of XBMC plugins.',

@@ -3,8 +3,20 @@
 Installation
 ============
 
-The quickest (and best) option for installing xbmcswift2 depends on Python 2.5
-or higher, virtualenv and pip.
+.. note::
+
+    The purpose of xbmcswift2 is to have the ability to run the addon on the
+    command line as well as in XBMC. This means that we will have to install
+    xbmcswift2 twice, once for the command line and once as an XBMC addon.
+
+
+The easiest way to get the most recent version of xbmcswift2 for XBMC is to
+install an addon that requires xbmcswift2. You can find a list of such addons
+on the :ref:`poweredby` page. The other options is download the correct version
+from https://github.com/jbeluch/xbmcswift2-xbmc-dist/tags and unpack it into
+your addons folder.  
+
+Now, on to installing xbmcswift2 for use on the command line.
 
 virtualenv
 ----------
@@ -12,7 +24,7 @@ virtualenv
 Virtualenv is an awesome tool that enables clean installation and removal of
 python libraries into a "virtual environment". Using a virtual environment
 means that when you install a library, it doesn't pollute your system-wide
-python installation. This makes it possible to install different versions of
+python installation. This makes it possible to install different versions of a
 library in different environments and they will never conflict.
 
 If you already have pip installed, you can simply::

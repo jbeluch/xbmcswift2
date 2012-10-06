@@ -41,17 +41,10 @@ Module
     :members:
     :inherited-members:
 
-Cache
-`````
 
-.. autoclass:: Cache
-    :members:
-    :inherited-members:
-
-
-TimedCache
+TimedStorage
 ``````````
 
-.. autoclass:: TimedCache
+.. autoclass:: TimedStorage
     :members:
     :inherited-members:
