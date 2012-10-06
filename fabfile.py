@@ -160,7 +160,7 @@ def release(xbmc_version=None):
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    release_prepare(xbmc_version)
+    dist_path = release_prepare(xbmc_version)
     release_perform(xbmc_version, dist_path)
 
 
