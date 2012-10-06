@@ -52,7 +52,7 @@ class XBMCMixin(object):
         def decorating_function(function):
             # TODO test this method
             storage = self.get_storage('.functions', file_format='pickle',
-                                       ttl=timedelta(hours=ttl_hours))
+                                       TTL=TTL)
             kwd_mark = 'f35c2d973e1bbbc61ca60fc6d7ae4eb3'
 
             @wraps(function)
@@ -104,7 +104,7 @@ class XBMCMixin(object):
                                       name, the file_format parameter is
                                       ignored. The format will be determined by
                                       the existing storage file.
-        :param TTL: The time to live for storage items specified in hours or None
+        :param TTL: The time to live for storage items specified in minutes or None
                     for no expiration. Since storage items aren't expired until a
                     storage is loaded form disk, it is possible to call
                     get_storage() with a different TTL than when the storage was
