@@ -4,6 +4,7 @@ from xbmcswift2.mockxbmc import utils
 
 
 class Addon(object):
+
     def __init__(self, id=None):
         # In CLI mode, xbmcswift2 must be run from the root of the addon
         # directory, so we can rely on getcwd() being correct.
@@ -14,7 +15,6 @@ class Addon(object):
         }
         self._strings = {}
         self._settings = {}
-        
 
     def getAddonInfo(self, id):
         properties = ['author', 'changelog', 'description', 'disclaimer',
