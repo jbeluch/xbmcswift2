@@ -97,7 +97,7 @@ class Plugin(XBMCMixin):
         self._end_of_directory = False
 
         # The plugin's named logger
-        self._log = setup_log(addon_id)
+        self._log = setup_log(self._addon_id)
 
         # The path to the storage directory for the addon
         self._storage_path = xbmc.translatePath(
