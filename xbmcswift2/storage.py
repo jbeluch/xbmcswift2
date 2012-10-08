@@ -91,7 +91,6 @@ class _PersistentDictMixin(object):
             try:
                 return self.initial_update(loader(fileobj))
             except Exception as e:
-                print e
                 pass
         raise ValueError('File not in a supported format')
 
