@@ -11,6 +11,7 @@ import os
 import string
 import readline
 from os import getcwd
+from xml.sax import saxutils
 from optparse import OptionParser
 from shutil import copytree, ignore_patterns
 
@@ -104,19 +105,23 @@ def get_value(prompt, default=None):
     return ans
 
 
-def update_file(func, items):
-    '''Edits the file found at func in place, replacing any instances of {key}
-    with the appropriate value from the provided items dict.
+def update_file(filename, items):
+    '''Edits the given file in place, replacing any instances of {key} with the
+    appropriate value from the provided items dict. If the given filename ends
+    with ".xml" values will be quoted and escaped for XML.
     '''
-    with open(func, 'r') as inp:
+    should_escape = filename.endswith('.xml')
+
+    with open(filename, 'r') as inp:
         text = inp.read()
 
     for key, val in items.items():
+        if should_escape:
+            val = saxutils.quoteattr(val)
         text = text.replace('{%s}' % key, val)
     output = text
 
-    # Now write out the file
-    with open(func, 'w') as out:
+    with open(filename, 'w') as out:
         out.write(output)
 
 
