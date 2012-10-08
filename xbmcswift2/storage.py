@@ -11,7 +11,7 @@ import os
 import csv
 import json
 import time
-import pickle
+import cPickle as pickle
 import shutil
 import collections
 from datetime import datetime
