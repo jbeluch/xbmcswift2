@@ -7,7 +7,7 @@
     :copyright: (c) 2012 by Jonathan Beluch
     :license: GPLv3, see LICENSE for more details.
 '''
-import pickle
+import cPickle as pickle
 import urllib2
 
 

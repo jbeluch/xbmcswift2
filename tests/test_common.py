@@ -70,8 +70,8 @@ class TestPickleDict(TestCase):
             ('animal', 'dog'),
             ('boolean', 'I01\n.'),
             ('number', 'I42\n.'),
-            ('list', "(lp0\nS'a'\np1\naS'b'\np2\na."),
-            ('dict', "(dp0\nS'foo'\np1\nS'bar'\np2\ns."),
+            ('list', "(lp1\nS'a'\naS'b'\na.",),
+            ('dict', "(dp1\nS'foo'\np2\nS'bar'\np3\ns."),
         )
 
 
