@@ -4,7 +4,7 @@ from xbmcswift2 import log
 
 
 TEMP_DIR = os.path.join(tempfile.gettempdir(), 'xbmcswift2_debug')
-log.info('Using temp directory %s' % TEMP_DIR)
+log.info('Using temp directory %s', TEMP_DIR)
 
 
 def _create_dir(path):

@@ -63,14 +63,13 @@ class XBMCMixin(object):
 
                 try:
                     result = storage[key]
-                    #log.debug('Cache hit for key "%s"' % (key, ))
                     log.debug('Storage hit for function "%s" with args "%s" '
-                              'and kwargs "%s"' % (function.__name__, args,
-                                                   kwargs))
+                              'and kwargs "%s"', function.__name__, args,
+                              kwargs)
                 except KeyError:
                     log.debug('Storage miss for function "%s" with args "%s" '
-                              'and kwargs "%s"' % (function.__name__, args,
-                                                   kwargs))
+                              'and kwargs "%s"', function.__name__, args,
+                              kwargs)
                     result = function(*args, **kwargs)
                     storage[key] = result
                     storage.sync()
@@ -116,13 +115,13 @@ class XBMCMixin(object):
         filename = os.path.join(self.storage_path, name)
         try:
             storage = self._unsynced_storages[filename]
-            log.debug('Loaded storage "%s" from memory' % name)
+            log.debug('Loaded storage "%s" from memory', name)
         except KeyError:
             if TTL:
                 TTL = timedelta(minutes=TTL)
             storage = TimedStorage(filename, file_format, TTL)
             self._unsynced_storages[filename] = storage
-            log.debug('Loaded storage "%s" from disk' % name)
+            log.debug('Loaded storage "%s" from disk', name)
         return storage
 
     def temp_fn(self, path):
@@ -356,7 +355,8 @@ class XBMCMixin(object):
         # Close any open storages which will persist them to disk
         if hasattr(self, '_unsynced_storages'):
             for storage in self._unsynced_storages.values():
-                log.debug('Saving a %s storage to disk at "%s"' % (storage.file_format, storage.filename))
+                log.debug('Saving a %s storage to disk at "%s"',
+                          storage.file_format, storage.filename)
                 storage.close()
 
         # Return the cached list of all the list items that were added
