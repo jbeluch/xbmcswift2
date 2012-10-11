@@ -3,6 +3,10 @@ from xbmcswift2.logger import log
 from xbmcswift2.mockxbmc import utils
 
 
+def _get_env_setting(name):
+    return os.getenv('XBMCSWIFT2_%s' % name.upper())
+
+
 class Addon(object):
 
     def __init__(self, id=None):
@@ -29,12 +33,16 @@ class Addon(object):
         return self._strings[key]
 
     def getSetting(self, id):
+        log.warning('xbmcaddon.Addon.getSetting() has not been implemented in '
+                    'CLI mode.')
         try:
             value = self._settings[id]
         except KeyError:
-            log.warning('xbmcaddon.Addon.getSetting() has not been implemented'
-                        ' in CLI mode.')
-            value = raw_input('* Please enter a temporary value for %s: ' % id)
+            # see if we have an env var
+            value = _get_env_setting(id)
+            if _get_env_setting(id) is None:
+                value = raw_input('* Please enter a temporary value for %s: ' %
+                                  id)
             self._settings[id] = value
         return value
 
