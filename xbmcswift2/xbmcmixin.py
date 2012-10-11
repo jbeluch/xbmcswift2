@@ -73,7 +73,7 @@ class XBMCMixin(object):
                                                    kwargs))
                     result = function(*args, **kwargs)
                     storage[key] = result
-                storage.sync()
+                    storage.sync()
                 return result
             return wrapper
         return decorating_function
