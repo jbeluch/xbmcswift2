@@ -7,9 +7,10 @@ class TestXBMCUrl(TestCase):
         known_values = (
             # url, options_dict, expected_value
             ('url', {}, 'url'),
-            ('url', {'key': 'val'}, 'url key=val'),
-            ('url', {'key': 3}, 'url key=3'),
-            ('url', {'a': 'b', 'c': 'd'}, 'url a=b c=d'),
+            ('url', {'key': 'val'}, 'url|key=val'),
+            ('url', {'key': 3}, 'url|key=3'),
+            ('url', {'a': 'b', 'c': 'd'}, 'url|a=b&c=d'),
+            ('url', {'symbol': '=', 'c': 'd'}, 'url|symbol=%3D&c=d'),
         )
         for url, options, expected in known_values:
             self.assertEqual(expected, xbmc_url(url, **options))
@@ -35,7 +36,7 @@ class TestEnum(TestCase):
 
 #class TestUrlParse(TestCase):
     #def test_url_parse(self):
-        ## supposed to return scheme, netloc and path 
+        ## supposed to return scheme, netloc and path
         #known_values = (
             ## url, scheme, netloc, path
             #('plugin://my.plugin.id/path/', 'plugin', 'my.plugin.id', '/path/'),
