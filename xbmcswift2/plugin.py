@@ -217,11 +217,18 @@ class Plugin(XBMCMixin):
         for func in module._register_funcs:
             func(self, url_prefix)
 
-    def cached_route(self, url_rule, name=None, options=None):
-        '''A decorator to add a route to a view and also apply caching.
+    def cached_route(self, url_rule, name=None, options=None, TTL=None):
+        '''A decorator to add a route to a view and also apply caching. The
+        url_rule, name and options arguments are the same arguments for the
+        route function. The TTL argument if given will passed along to the
+        caching decorator.
         '''
         route_decorator = self.route(url_rule, name=name, options=options)
-        cache_decorator = self.cached()
+        if TTL:
+            cache_decorator = self.cached(TTL)
+        else:
+            cache_decorator = self.cached()
+
         def new_decorator(func):
             return route_decorator(cache_decorator(func))
         return new_decorator
