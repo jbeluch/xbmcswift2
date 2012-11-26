@@ -87,8 +87,8 @@ can use python's default argument syntax.
 .. sourcecode:: python
 
     @plugin.route('/movies/', name='show_movie_genres')
-    @plugin.route('/silents/', name='show_silent_genres', {'path': 'index.php/silent-films-menu'})
-    @plugin.route('/serials/', name='show_serials', {'path': 'index.php/serials'})
+    @plugin.route('/silents/', name='show_silent_genres', options={'path': 'index.php/silent-films-menu'})
+    @plugin.route('/serials/', name='show_serials', options={'path': 'index.php/serials'})
     def show_genres(path='movies'):
         pass
 
