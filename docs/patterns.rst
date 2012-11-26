@@ -18,7 +18,7 @@ Use the :meth:`~xbmcswift2.Plugin.cached_route` decorator instead of the normal
 cannot return plugin.finish(). This is due to a current limitation in the cache
 which doesn't keep track of side effects such as a call to plugin.finish. If
 you need to call plugin.finish() because you are passing non-default arguments,
-then see the next example which uses plugin.cache().
+then see the next example which uses plugin.cached().
 
 .. sourcecode:: python
 
@@ -38,7 +38,7 @@ General Function Caching
 ````````````````````````
 
 To cache the results of any function call, simply use the
-:meth:`~xbmcswift2.Plugin.cache` decorator. Keep in mind that the function name
+:meth:`~xbmcswift2.Plugin.cached` decorator. Keep in mind that the function name
 along with the args and kwargs used to call the function are used as the cache
 key. If your function depends on any variables in outer scope which could
 affect the return value, you should pass in those variables explictly as args
@@ -46,7 +46,7 @@ to ensure a different cache entry is created.
 
 .. sourcecode:: python
 
-    @plugin.cache()
+    @plugin.cached()
     def get_api_data():
         return download_data()
 
@@ -87,8 +87,8 @@ can use python's default argument syntax.
 .. sourcecode:: python
 
     @plugin.route('/movies/', name='show_movie_genres')
-    @plugin.route('/silents/', name='show_silent_genres', {'path': 'index.php/silent-films-menu'})
-    @plugin.route('/serials/', name='show_serials', {'path': 'index.php/serials'})
+    @plugin.route('/silents/', name='show_silent_genres', options={'path': 'index.php/silent-films-menu'})
+    @plugin.route('/serials/', name='show_serials', options={'path': 'index.php/serials'})
     def show_genres(path='movies'):
         pass
 

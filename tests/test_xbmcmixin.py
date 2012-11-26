@@ -169,6 +169,12 @@ class TestXBMCMixin(TestCase):
                 'XBMC.Notification("Hello World!", "My Title", "3000", "http://example.com/image.png")'
         )
 
+    @patch('xbmcswift2.xbmc.Keyboard')
+    def test_keyboard(self, mockKeyboard):
+        plugin = TestMixedIn()
+        with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
+            plugin.keyboard()
+        mockKeyboard.assert_called_with('', 'Academic Earth', False)
 
 
 class TestAddItems(TestCase):
@@ -190,7 +196,7 @@ class TestAddItems(TestCase):
         returned = plugin.add_items(items)
 
         # TODO: Assert actual arguments passed to the addDirectoryItems call
-        assert addDirectoryItems.called 
+        assert addDirectoryItems.called
         calls = [
             call(label='Course 1', path='plugin.image.test/foo', info_type='pictures'),
             call(label='Course 2', path='plugin.image.test/bar', info_type='pictures'),
@@ -216,7 +222,7 @@ class TestAddItems(TestCase):
         returned = plugin.add_items(items)
 
         # TODO: Assert actual arguments passed to the addDirectoryItems call
-        assert addDirectoryItems.called 
+        assert addDirectoryItems.called
         calls = [
             call(label='Course 1', path='plugin.image.test/foo', info_type='video'),
         ]
@@ -242,7 +248,7 @@ class TestAddItems(TestCase):
         returned = plugin.add_items(items)
 
         # TODO: Assert actual arguments passed to the addDirectoryItems call
-        assert addDirectoryItems.called 
+        assert addDirectoryItems.called
         calls = [
             call(label='Course 1', path='plugin.image.test/foo', info_type='music'),
         ]
