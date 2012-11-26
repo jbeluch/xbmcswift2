@@ -9,7 +9,10 @@
 '''
 import urllib
 import urllib2
-import cPickle as pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 
 def xbmc_url(url, **options):
