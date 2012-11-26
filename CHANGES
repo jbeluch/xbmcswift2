@@ -1,5 +1,13 @@
+0.3
+===
+
+Unreleased.
+
+
 0.2.1
 =====
+
+Released on November 25th, 2012.
 
 * Update usages of pickle to use cPickle if available.
 * Allow settings to be specified as environment variables when running in CLI
