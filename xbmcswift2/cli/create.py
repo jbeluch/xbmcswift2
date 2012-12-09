@@ -110,7 +110,10 @@ def update_file(filename, items):
     appropriate value from the provided items dict. If the given filename ends
     with ".xml" values will be quoted and escaped for XML.
     '''
-    should_escape = filename.endswith('.xml')
+    # TODO: Implement something in the templates to denote whether the value
+    # being replaced is an XML attribute or a value. Perhaps move to dyanmic
+    # XML tree building rather than string replacement.
+    should_escape = filename.endswith('addon.xml')
 
     with open(filename, 'r') as inp:
         text = inp.read()
