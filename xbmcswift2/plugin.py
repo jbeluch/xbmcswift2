@@ -300,6 +300,14 @@ class Plugin(XBMCMixin):
             # Allow the returning of bare dictionaries so we can cache view
             if not self._end_of_directory and self.handle == 0:
                 listitems = self.finish(listitems)
+
+            # Close any open storages which will persist them to disk
+            if hasattr(self, '_unsynced_storages'):
+                for storage in self._unsynced_storages.values():
+                    log.debug('Saving a %s storage to disk at "%s"',
+                              storage.file_format, storage.filename)
+                    storage.close()
+
             return listitems
         raise NotFoundException, 'No matching view found for %s' % path
 
