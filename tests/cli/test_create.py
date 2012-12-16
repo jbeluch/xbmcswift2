@@ -19,7 +19,7 @@ class TestCreate(unittest.TestCase):
         self.assertEqual('This is a test of the emergency kitten system.', result)
 
     def test_update_xml_file(self):
-        fileobj, filename = tempfile.mkstemp(suffix='.xml', text=True)
+        fileobj, filename = tempfile.mkstemp(suffix='addon.xml', text=True)
         print filename
 
         # setup
