@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import pickle
 from unittest import TestCase
 
 from mock import Mock, patch
@@ -246,3 +247,25 @@ class TestBasicRouting(TestCase):
 
 class TestRegisterModule():
     pass
+
+
+class TestUnsyncedCaches(TestCase):
+
+    def test_unsyced_caches(self):
+
+        plugin = NewPlugin()
+        @plugin.route('/')
+        def route_that_doesnt_call_finish():
+            ppl = plugin.get_storage('people')
+            ppl['foo'] = 'bar'
+        sys.argv = ['plugin://plugin.video.helloxbmc/', '1', '?']
+        plugin.run()
+
+        # ensure the cache is persisted to disk
+        fn = os.path.join(plugin.storage_path, 'people')
+        synced = pickle.load(open(fn, 'rb'))
+        self.assertEqual(synced.keys(), ['foo'])
+
+        # Since storages store the timestamp as well, we just check our actual
+        # value since we can't guess the timestamp
+        self.assertEqual(synced['foo'][0], 'bar')
