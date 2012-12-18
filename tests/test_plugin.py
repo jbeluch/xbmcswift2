@@ -168,7 +168,7 @@ class TestBasicRouting(TestCase):
             return [{'label': 'Hello XBMC'}]
         self.assertEqual(plugin.url_for('main_menu'), 'plugin://plugin.video.helloxbmc/')
         self.assertEqual(plugin.url_for('main_menu', foo='bar'), 'plugin://plugin.video.helloxbmc/?foo=bar')
-        self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=I3%0A.&_pickled=foo')
+        self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=3')
 
     def test_url_for_multiple_routes(self):
         plugin = NewPlugin()
@@ -178,7 +178,7 @@ class TestBasicRouting(TestCase):
             return [{'label': 'Hello XBMC'}]
         self.assertEqual(plugin.url_for('main_menu'), 'plugin://plugin.video.helloxbmc/')
         self.assertEqual(plugin.url_for('main_menu', foo='bar'), 'plugin://plugin.video.helloxbmc/?foo=bar')
-        self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=I3%0A.&_pickled=foo')
+        self.assertEqual(plugin.url_for('main_menu', foo=3), 'plugin://plugin.video.helloxbmc/?foo=3')
         self.assertEqual(plugin.url_for('videos'), 'plugin://plugin.video.helloxbmc/videos/')
 
     def test_options(self):
