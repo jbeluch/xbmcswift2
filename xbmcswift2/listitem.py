@@ -181,7 +181,8 @@ class ListItem(object):
     @classmethod
     def from_dict(cls, label=None, label2=None, icon=None, thumbnail=None,
                   path=None, selected=None, info=None, properties=None,
-                  context_menu=None, is_playable=None, info_type='video'):
+                  context_menu=None, replace_context_menu=False,
+                  is_playable=None, info_type='video'):
         '''A ListItem constructor for setting a lot of properties not
         available in the regular __init__ method. Useful to collect all
         the properties in a dict and then use the **dct to call this
@@ -202,9 +203,7 @@ class ListItem(object):
             for key, val in properties:
                 listitem.set_property(key, val)
 
-        # By default doesn't replace, use .add_context_menu_items if you wish
-        # to set replace_items=True
         if context_menu:
-            listitem.add_context_menu_items(context_menu)
+            listitem.add_context_menu_items(context_menu, replace_context_menu)
 
         return listitem
