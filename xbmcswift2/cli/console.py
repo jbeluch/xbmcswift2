@@ -11,7 +11,10 @@
 
 def get_max_len(items):
     '''Returns the max of the lengths for the provided items'''
-    return max(len(item) for item in items)
+    try:
+        return max(len(item) for item in items)
+    except ValueError:
+        return 0
 
 
 def display_listitems(items):
