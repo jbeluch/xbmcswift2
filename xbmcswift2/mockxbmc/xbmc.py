@@ -1,6 +1,7 @@
 import tempfile
 import os, errno
 from xbmcswift2 import log
+from xbmcswift2.cli.create import get_value
 
 
 TEMP_DIR = os.path.join(tempfile.gettempdir(), 'xbmcswift2_debug')
@@ -53,3 +54,34 @@ def translatePath(path):
     _create_dir(os.path.join(TEMP_DIR, parts[0]))
 
     return os.path.join(TEMP_DIR, *parts)
+
+class Keyboard(object):
+    def __init__(self, default='', heading='', hidden=False):
+        self._heading = heading
+        self._default = default
+        self._hidden = hidden
+        self._confirmed = False
+        self._input = None
+        
+    def setDefault(self, default):
+        self._default = default
+
+    def setHeading(self, heading):
+        self._heading = heading
+
+    def setHiddenInput(self, hidden):
+        self._hidden = hidden
+
+    def doModal(self):
+        self._confirmed = False
+        try:
+            self._input = get_value(self._heading, self._default, hidden=self._hidden)
+            self._confirmed = True
+        except (KeyboardInterrupt, EOFError):
+            pass
+
+    def isConfirmed(self):
+        return self._confirmed
+
+    def getText(self):
+        return self._input
