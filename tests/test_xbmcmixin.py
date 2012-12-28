@@ -75,7 +75,19 @@ class TestXBMCMixin(TestCase):
         assert self.m.addon.openSettings.called
 
     def test_set_resolved_url(self):
-        raise SkipTest('Test not implemented.')
+        url = 'http://www.example.com/video.mp4'
+        ret = self.m.set_resolved_url(url)
+        item = ret[0]
+        self.assertIsInstance(item, xbmcswift2.ListItem)
+        self.assertTrue(item.get_played())
+
+    def test_set_resolved_url2(self):
+        item = {'path': 'http://www.example.com/video.mp4'}
+        ret = self.m.set_resolved_url(item=item)
+        item = ret[0]
+        self.assertIsInstance(item, xbmcswift2.ListItem)
+        self.assertTrue(item.get_played())
+
 
     @patch.object(xbmc, 'Player')
     @patch('xbmcswift2.ListItem', wraps=xbmcswift2.ListItem)

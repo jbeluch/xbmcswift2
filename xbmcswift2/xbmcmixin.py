@@ -14,6 +14,8 @@ from common import Modes, DEBUG_MODES
 from request import Request
 
 
+
+
 class XBMCMixin(object):
     '''A mixin to add XBMC helper methods. In order to use this mixin,
     the child class must implement the following methods and
@@ -228,17 +230,54 @@ class XBMCMixin(object):
         xbmc.executebuiltin('XBMC.Notification("%s", "%s", "%s", "%s")' %
                             (msg, title, delay, image))
 
-    def set_resolved_url(self, url):
-        item = xbmcswift2.ListItem(path=url)
+    def _listitemify(self, item):
+        '''Creates an xbmcswift2.ListItem if the provided value for item is a
+        dict. If item is already a valid xbmcswift2.ListItem, the item is
+        returned unmodified.
+        '''
+        info_type = self.info_type if hasattr(self, 'info_type') else 'video'
+
+        # Create ListItems for anything that is not already an instance of
+        # ListItem
+        if not hasattr(item, 'as_tuple'):
+            if 'info_type' not in item.keys():
+                item['info_type'] = info_type
+            item = xbmcswift2.ListItem.from_dict(**item)
+        return item
+
+    def set_resolved_url(self, url=None, item=None):
+        '''Takes a url or a listitem to be played. Used in conjunction with a
+        playable list item with a path that calls back into your addon.
+
+        :param url:
+                    .. deprecated:: 0.3.0
+                    Use `item` instead. A playable URL.
+        :param item: A playable list item.
+        '''
+        if url:
+            log.warning('The "url" param has been deprecated. Please use the '
+                        '"item" param instead.')
+
+        if url is None and item is None:
+            raise ValueError('Either url or item must have a non-None value.')
+
+        # if a url was provided, ignore any value passed for item
+        if url:
+            item = {'path': url}
+
+        item = self._listitemify(item)
         item.set_played(True)
         xbmcplugin.setResolvedUrl(self.handle, True, item.as_xbmc_listitem())
         return [item]
 
     def play_video(self, item, player=xbmc.PLAYER_CORE_DVDPLAYER):
-        if not hasattr(item, 'as_xbmc_listitem'):
-            if 'info_type' not in item.keys():
-                item['info_type'] = 'video'
-            item = xbmcswift2.ListItem.from_dict(**item)
+        try:
+            # videos are always type video
+            item['info_type'] = 'video'
+        except TypeError:
+            pass  # not a dict
+
+        item = self._listitemify(item)
         item.set_played(True)
         xbmc.Player(player).play(item.get_path(), item.as_xbmc_listitem())
         return [item]
@@ -254,19 +293,7 @@ class XBMCMixin(object):
                       :meth:`xbmcswift2.ListItem.from_dict` or an instance of
                       :class:`xbmcswift2.ListItem`.
         '''
-        # For each item if it is not already a list item, we need to create one
-        _items = []
-        info_type = self.info_type if hasattr(self, 'info_type') else 'video'
-
-        # Create ListItems for anything that is not already an instance of
-        # ListItem
-        for item in items:
-            if not isinstance(item, xbmcswift2.ListItem):
-                if 'info_type' not in item.keys():
-                    item['info_type'] = info_type
-                item = xbmcswift2.ListItem.from_dict(**item)
-            _items.append(item)
-
+        _items = [self._listitemify(item) for item in items]
         tuples = [item.as_tuple() for item in _items]
         xbmcplugin.addDirectoryItems(self.handle, tuples, len(tuples))
 
