@@ -145,10 +145,46 @@ class XBMCMixin(object):
         #assert content in contents, 'Content type "%s" is not valid' % content
         xbmcplugin.setContent(self.handle, content)
 
-    def get_setting(self, key):
+    def get_setting(self, key, converter=None, choices=None):
+        '''Returns the settings value for the provided key.
+        If converter is str, unicode, bool or int the settings value will be
+        returned converted to the provided type.
+        If choices is an instance of list or tuple its item at position of the
+        settings value be returned.
+        .. note:: It is suggested to always use unicode for text-settings
+                  because else xbmc returns utf-8 encoded strings.
+
+        :param key: The id of the setting defined in settings.xml.
+        :param converter: (Optional) Choices are str, unicode, bool and int.
+        :param converter: (Optional) Choices are instances of list or tuple.
+
+        Examples: 
+            * ``plugin.get_setting('per_page', int)``
+            * ``plugin.get_setting('password', unicode)``
+            * ``plugin.get_setting('force_viewmode', bool)``
+            * ``plugin.get_setting('content', choices=('videos', 'movies'))``
+        '''
         #TODO: allow pickling of settings items?
         # TODO: STUB THIS OUT ON CLI
-        return self.addon.getSetting(id=key)
+        value = self.addon.getSetting(id=key)
+        if converter is str:
+            return value
+        elif converter is unicode:
+            return value.decode('utf-8')
+        elif converter is bool:
+            return value == 'true'
+        elif converter is int:
+            return int(value)
+        elif isinstance(choices, (list, tuple)):
+            return choices[int(value)]
+        elif converter is None:
+            log.warning('No converter provided, unicode should be used, '
+                        'but returning str value')
+            return value
+        else:
+            raise TypeError('Acceptable converters are str, unicode, bool and '
+                            'int. Acceptable choices are instances of list '
+                            ' or tuple.')
 
     def set_setting(self, key, val):
         # TODO: STUB THIS OUT ON CLI

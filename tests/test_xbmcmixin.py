@@ -65,6 +65,26 @@ class TestXBMCMixin(TestCase):
     def test_get_setting(self):
         self.m.get_setting('username')
         assert self.m.addon.getSetting.called_with(id='username')
+        # Test int
+        self.m.addon.getSetting.return_value = '3'
+        self.assertEqual(self.m.get_setting('int'), '3')
+        self.assertEqual(self.m.get_setting('int', int), 3)
+        # Test bool
+        self.m.addon.getSetting.return_value = 'true'
+        self.assertEqual(self.m.get_setting('bool'), 'true')
+        self.assertEqual(self.m.get_setting('bool', bool), True)
+        self.m.addon.getSetting.return_value = 'false'
+        self.assertEqual(self.m.get_setting('bool'), 'false')
+        self.assertEqual(self.m.get_setting('bool', bool), False)
+        # Test unicode
+        self.m.addon.getSetting.return_value = 'd\xc3\xb6ner'
+        self.assertEqual(self.m.get_setting('unicode'), 'd\xc3\xb6ner')
+        self.assertEqual(self.m.get_setting('unicode', unicode), u'd\xf6ner')
+        # Test list
+        self.m.addon.getSetting.return_value = '2'
+        lst = ('1', 2, True, False)
+        self.assertEqual(self.m.get_setting('list'), '2')
+        self.assertEqual(self.m.get_setting('list', choices=lst), lst[2])
 
     def test_set_setting(self):
         self.m.set_setting('username', 'xbmc')
