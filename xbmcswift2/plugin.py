@@ -298,7 +298,10 @@ class Plugin(XBMCMixin):
             # (handle will be >= 0). Do not call self.finish() when called via
             # RunPlugin() (handle will be -1).
             if not self._end_of_directory and self.handle >= 0:
-                listitems = self.finish(listitems)
+                if listitems is None:
+                    self.finish(succeeded=False)
+                else:
+                    listitems = self.finish(listitems)
 
             return listitems
         raise NotFoundException, 'No matching view found for %s' % path
