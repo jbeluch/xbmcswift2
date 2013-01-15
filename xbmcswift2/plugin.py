@@ -294,12 +294,9 @@ class Plugin(XBMCMixin):
                      path, view_func.__name__)
             listitems = view_func(**items)
 
-            # XXX: The UI Container listing call to plugin or the resolving
-            #      url call always has a handle greater or equals 0. RunPlugin()
-            #      call using a handle -1. we only auto-call endOfDirectory for 
-            #      the UI Container listing call. and set_resolve_url() also
-            #      set the _end_of_directory flag so we do not call finish() for it.
-            # Allow the returning of bare dictionaries so we can cache view
+            # Only call self.finish() for UI container listing calls to plugin
+            # (handle will be >= 0). Do not call self.finish() when called via
+            # RunPlugin() (handle will be -1).
             if not self._end_of_directory and self.handle >= 0:
                 listitems = self.finish(listitems)
 
