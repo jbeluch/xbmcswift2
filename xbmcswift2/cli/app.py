@@ -169,6 +169,10 @@ def interactive(plugin):
         if parent_stack and selected_item == parent_stack[-1]:
             # User selected the parent item, remove from list
             parent_stack.pop()
+        elif plugin._update_listing:
+            # addon passed update_listing=True to plugin.finish() so the
+            # current request url shouldn't go on the history stack
+            pass
         else:
             # User selected non parent item, add current url to parent stack
             parent_stack.append(ListItem.from_dict(label='..',

@@ -33,6 +33,8 @@ class XBMCMixin(object):
 
         _end_of_directory = False
 
+        _update_listing
+
         self.handle
 
     # optional
@@ -447,6 +449,7 @@ class XBMCMixin(object):
                 self.set_view_mode(view_mode_id)
 
         # Finalize the directory items
+        self._update_listing = update_listing
         self.end_of_directory(succeeded, update_listing, cache_to_disc)
 
         # Return the cached list of all the list items that were added
