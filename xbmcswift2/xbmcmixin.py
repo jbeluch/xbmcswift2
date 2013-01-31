@@ -41,6 +41,9 @@ class XBMCMixin(object):
     _unsynced_storages = None
     # TODO: Ensure above is implemented
     '''
+
+    _function_cache_name = '.functions'
+
     def cached(self, TTL=60 * 24):
         '''A decorator that will cache the output of the wrapped function. The
         key used for the cache is the function name as well as the `*args` and
@@ -53,7 +56,7 @@ class XBMCMixin(object):
         '''
         def decorating_function(function):
             # TODO test this method
-            storage = self.get_storage('.functions', file_format='pickle',
+            storage = self.get_storage(self._function_cache_name, file_format='pickle',
                                        TTL=TTL)
             kwd_mark = 'f35c2d973e1bbbc61ca60fc6d7ae4eb3'
 
@@ -78,6 +81,13 @@ class XBMCMixin(object):
                 return result
             return wrapper
         return decorating_function
+
+    def clear_function_cache(self):
+        '''Clears the storage that caches results when using
+        :meth:`xbmcswift2.Plugin.cached_route` or
+        :meth:`xbmcswift2.Plugin.cached`.
+        '''
+        self.get_storage(self._function_cache_name).clear()
 
     def list_storages(self):
         '''Returns a list of existing stores. The returned names can then be

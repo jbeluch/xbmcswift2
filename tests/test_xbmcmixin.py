@@ -29,6 +29,8 @@ class TestMixedIn(XBMCMixin):
 
 class MixedIn(XBMCMixin):
 
+    storage_path = '/tmp'
+
     def __init__(self, **kwargs):
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
@@ -207,6 +209,26 @@ class TestXBMCMixin(TestCase):
         with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
             plugin.keyboard()
         mockKeyboard.assert_called_with('', 'Academic Earth', False)
+
+
+    def test_clear_function_cache(self):
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         info_type='pictures',
+                         handle=0,
+                         )
+        @plugin.cached()
+        def echo(msg):
+            return msg
+        echo('hello')
+
+        # cache should now contain 1 item
+        storage = plugin.get_storage('.functions')
+        self.assertEqual(len(storage.items()), 1)
+        plugin.clear_function_cache()
+        self.assertEqual(len(storage.items()), 0)
 
 
 class TestAddItems(TestCase):
