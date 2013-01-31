@@ -33,7 +33,7 @@ class TestCache(TestCase):
         self.assertEqual(42, storage2['answer'])
 
         remove(filename)
-        
+
     def test_csv(self):
         filename = '/tmp/testdict.csv'
         remove(filename)
@@ -52,7 +52,7 @@ class TestCache(TestCase):
         self.assertEqual('42', storage2['answer'])
 
         remove(filename)
-    
+
     def test_json(self):
         filename = '/tmp/testdict.json'
         remove(filename)
@@ -71,9 +71,10 @@ class TestCache(TestCase):
         self.assertEqual('42', storage2['answer'])
 
         remove(filename)
-    
+
 
 class TestTimedStorage(TestCase):
+
     def test_pickle(self):
         filename = '/tmp/testdict.pickle'
         remove(filename)
@@ -95,3 +96,21 @@ class TestTimedStorage(TestCase):
         # Ensure the expired dict was synced
         storage4 = TimedStorage(filename, file_format='pickle', TTL=timedelta(hours=1))
         self.assertEqual(sorted(storage3.items()), sorted(storage4.items()))
+
+
+class Test_Storage(TestCase):
+
+    def test_clear(self):
+        filename = '/tmp/testclear.json'
+        storage = _Storage(filename, file_format='json')
+        storage['name'] = 'jon'
+        storage.sync()
+
+        # dict with single value is now saved to disk
+        with open(filename) as inp:
+            self.assertEqual(inp.read(), '{"name":"jon"}')
+
+        # now clear the dict, it should sync to disk.
+        storage.clear()
+        with open(filename) as inp:
+            self.assertEqual(inp.read(), '{}')
