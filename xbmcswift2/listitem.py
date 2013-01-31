@@ -108,6 +108,10 @@ class ListItem(object):
         '''Sets a property for the given key and value'''
         return self._listitem.setProperty(key, value)
 
+    def add_stream_info(self, stream_type, stream_values):
+        '''Adds stream details'''
+        return self._listitem.addStreamInfo(stream_type, stream_values)
+
     def get_icon(self):
         '''Returns the listitem's icon image'''
         return self._icon
@@ -182,7 +186,7 @@ class ListItem(object):
     def from_dict(cls, label=None, label2=None, icon=None, thumbnail=None,
                   path=None, selected=None, info=None, properties=None,
                   context_menu=None, replace_context_menu=False,
-                  is_playable=None, info_type='video'):
+                  is_playable=None, info_type='video', stream_info=None):
         '''A ListItem constructor for setting a lot of properties not
         available in the regular __init__ method. Useful to collect all
         the properties in a dict and then use the **dct to call this
@@ -202,6 +206,13 @@ class ListItem(object):
         if properties:
             for key, val in properties:
                 listitem.set_property(key, val)
+
+        if stream_info:
+            assert isinstance(stream_info, dict)
+            for stream_type in ('video', 'audio', 'subtitle'):
+                if stream_type in stream_info:
+                    stream_values = stream_info[stream_type]
+                    listitem.add_stream_info(stream_type, stream_values)
 
         if context_menu:
             listitem.add_context_menu_items(context_menu, replace_context_menu)
