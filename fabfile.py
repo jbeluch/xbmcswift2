@@ -27,7 +27,8 @@ REPO_PUBLIC_URL = 'git://github.com/jbeluch/xbmcswift2-xbmc-dist.git'
 BRANCHES = {
     # <xbmc_version>: <git_branch>
     'DHARMA': 'dharma',
-    'EDEN': 'master',
+    'EDEN': 'eden',
+    'FRODO': 'master',
 }
 
 
