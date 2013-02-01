@@ -177,10 +177,16 @@ def interactive(plugin):
                 # uses update_listing=True. There won't be two items on the
                 # stack.
                 parent_stack.pop()  # remove the incorrect parent
-                selected_item = parent_stack.pop() # reassign selected_item to the correct parent
+
+                # reassign selected_item to the correct parent
+                selected_item = parent_stack.pop()
             else:
                 # User selected the parent item, remove from list
                 parent_stack.pop()
+        elif plugin._update_listing:
+            # since update_listing=True, we do not add this url to the parent
+            # stack.
+            pass
         else:
             # User selected non parent item, add current url to parent stack
             parent_stack.append(ListItem.from_dict(label='..',
