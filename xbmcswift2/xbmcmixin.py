@@ -297,24 +297,23 @@ class XBMCMixin(object):
         '''Takes a url or a listitem to be played. Used in conjunction with a
         playable list item with a path that calls back into your addon.
 
-        :param url:
-                    .. deprecated:: 0.3.0
-                    Use `item` instead. A playable URL.
-        :param item: A playable list item or url.
-                     None item will tell xbmc the resolve failed.
+        :param item: A playable list item or url. Pass None to alert XBMC of a
+                     failure to resolve the item.
         '''
+        succeeded = True
         if item is None:
-            # None item/url indicates the resolve url failed.
-            xbmcplugin.setResolvedUrl(self.handle, False, xbmcswift2.ListItem().as_xbmc_listitem())
-            return
+            # None item indicates the resolve url failed.
+            item = {}
+            succeeded = False
 
         if isinstance(item, basestring):
-            # caller set the resolved url without argument keyword
+            # caller is passing a url instead of an item dict
             item = {'path': item}
 
         item = self._listitemify(item)
         item.set_played(True)
-        xbmcplugin.setResolvedUrl(self.handle, True, item.as_xbmc_listitem())
+        xbmcplugin.setResolvedUrl(self.handle, succeeded,
+                                  item.as_xbmc_listitem())
         return [item]
 
     def play_video(self, item, player=None):
