@@ -96,10 +96,6 @@ class Plugin(XBMCMixin):
         # A flag to keep track of a call to xbmcplugin.endOfDirectory()
         self._end_of_directory = False
 
-        # Keep track of the update_listing value passed to
-        # xbmcplugin.endOfDirectory()
-        self._update_listing = False
-
         # The plugin's named logger
         self._log = setup_log(self._addon_id)
 

@@ -27,10 +27,6 @@ class Module(XBMCMixin):
         # TODO: Think of a better log name
         self._log = setup_log(namespace)
 
-        # Keep track of the update_listing value passed to
-        # xbmcplugin.endOfDirectory()
-        self._update_listing = False
-
     # TODO: add setter for plugin during registration
     @property
     def plugin(self):

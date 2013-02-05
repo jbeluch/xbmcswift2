@@ -167,26 +167,8 @@ def interactive(plugin):
     selected_item = get_user_choice(items)
     while selected_item is not None:
         if parent_stack and selected_item == parent_stack[-1]:
-            if plugin._update_listing:
-                # We have already put the last update_listing=False item on the
-                # stack since we won't know if there will be a future usage of
-                # update_listing=True. The correct parent item is actually the
-                # parent of the currently selected_item, or 2 down the stack.
-
-                # TODO: Account for jumping into a plugin with a route that
-                # uses update_listing=True. There won't be two items on the
-                # stack.
-                parent_stack.pop()  # remove the incorrect parent
-
-                # reassign selected_item to the correct parent
-                selected_item = parent_stack.pop()
-            else:
-                # User selected the parent item, remove from list
-                parent_stack.pop()
-        elif plugin._update_listing:
-            # since update_listing=True, we do not add this url to the parent
-            # stack.
-            pass
+            # User selected the parent item, remove from list
+            parent_stack.pop()
         else:
             # User selected non parent item, add current url to parent stack
             parent_stack.append(ListItem.from_dict(label='..',
