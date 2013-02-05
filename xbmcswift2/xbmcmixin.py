@@ -6,7 +6,7 @@ from datetime import timedelta
 from functools import wraps
 
 import xbmcswift2
-from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin
+from xbmcswift2 import xbmc, xbmcaddon, xbmcplugin, xbmcgui
 from xbmcswift2.storage import TimedStorage
 from xbmcswift2.logger import log
 from xbmcswift2.constants import VIEW_MODES, SortMethod
@@ -133,7 +133,22 @@ class XBMCMixin(object):
         except KeyError:
             if TTL:
                 TTL = timedelta(minutes=TTL)
-            storage = TimedStorage(filename, file_format, TTL)
+
+            try:
+                storage = TimedStorage(filename, file_format, TTL)
+            except ValueError:
+                # Thrown when the storage file is corrupted and can't be read.
+                # Prompt user to delete storage.
+                choices = ['Clear storage', 'Cancel']
+                ret = xbmcgui.Dialog().select('A storage file is corrupted. It'
+                                              ' is recommended to clear it.',
+                                              choices)
+                if choices[ret] == 'Clear storage':
+                    os.remove(filename)
+                    storage = TimedStorage(filename, file_format, TTL)
+                else:
+                    raise Exception('Corrupted storage file at %s' % filename)
+
             self._unsynced_storages[filename] = storage
             log.debug('Loaded storage "%s" from disk', name)
         return storage
