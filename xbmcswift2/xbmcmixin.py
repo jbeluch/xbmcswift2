@@ -33,6 +33,8 @@ class XBMCMixin(object):
 
         _end_of_directory = False
 
+        _update_listing
+
         self.handle
 
     # optional
@@ -362,6 +364,7 @@ class XBMCMixin(object):
         Typically it is not necessary to call this method directly, as
         calling :meth:`~xbmcswift2.Plugin.finish` will call this method.
         '''
+        self._update_listing = update_listing
         if not self._end_of_directory:
             self._end_of_directory = True
             # Finalize the directory items
