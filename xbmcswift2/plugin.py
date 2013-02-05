@@ -276,11 +276,18 @@ class Plugin(XBMCMixin):
         Raises AmbiguousUrlException if there is more than one possible
         view for the given endpoint name.
         '''
-        if endpoint not in self._view_functions.keys():
-            raise NotFoundException, ('%s doesn\'t match any known patterns.' %
-                                      endpoint)
+        try:
+            rule = self._view_functions[endpoint]
+        except KeyError:
+            try:
+                rule = (rule for rule in self._view_functions.values() if rule.view_func == endpoint).next()
+            except StopIteration:
+                raise NotFoundException(
+                    '%s doesn\'t match any known patterns.' % endpoint)
 
-        rule = self._view_functions[endpoint]
+        # rule can be None since values of None are allowed in the
+        # _view_functions dict. This signifies more than one view function is
+        # tied to the same name.
         if not rule:
             # TODO: Make this a regular exception
             raise AmbiguousUrlException
