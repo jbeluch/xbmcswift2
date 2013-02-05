@@ -21,7 +21,7 @@ class TestListItem(TestCase):
         self.assertEqual(item.label, 'bar')
         item.set_label('baz')
         self.assertEqual(item.get_label(), 'baz')
-        
+
     def test_label2(self):
         item = ListItem('foo')
         self.assertIsNone(item.label2)
@@ -41,7 +41,7 @@ class TestListItem(TestCase):
         item.set_icon('baz')
         self.assertEqual(item.icon, 'baz')
         self.assertEqual(item.get_icon(), 'baz')
-        
+
     def test_thumbnail(self):
         item = ListItem()
         self.assertIsNone(item.thumbnail)
@@ -136,7 +136,7 @@ class TestListItem(TestCase):
     @patch('xbmcswift2.xbmcgui.ListItem.setProperty')
     def test_set_property(self, mock_setProperty):
         item = ListItem()
-        item.set_property('foo', 'bar') 
+        item.set_property('foo', 'bar')
         mock_setProperty.assert_called_with('foo', 'bar')
 
     def test_as_tuple(self):
@@ -160,6 +160,20 @@ class TestListItemAsserts(TestCase):
 
 
 class TestFromDict(TestCase):
+
+    def test_from_dict_props(self):
+        dct = {
+            'properties': {'StartOffset': '256.4'},
+        }
+        item = ListItem.from_dict(**dct)
+        self.assertEqual(item.get_property('StartOffset'), '256.4')
+
+        dct = {
+            'properties': [('StartOffset', '256.4')],
+        }
+        item = ListItem.from_dict(**dct)
+        self.assertEqual(item.get_property('StartOffset'), '256.4')
+
     def test_from_dict(self):
         dct = {
             'label': 'foo',
@@ -183,7 +197,7 @@ class TestFromDict(TestCase):
         self.assertEqual(item.selected, True)
         mock_set_info.assert_called_with('pictures', {'title': 'My title'})
         self.assertEqual(item.get_property('StartOffset'), '256.4')
-        self.assertEqual(item.get_context_menu_items(), [('label', 'action')]) 
+        self.assertEqual(item.get_context_menu_items(), [('label', 'action')])
         self.assertEqual(item.get_property('isPlayable'), 'true')
         self.assertEqual(item.is_folder, False)
 

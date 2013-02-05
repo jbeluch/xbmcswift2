@@ -200,6 +200,10 @@ class ListItem(object):
             listitem.set_is_playable(True)
 
         if properties:
+            # Need to support existing tuples, but prefer to have a dict for
+            # properties.
+            if hasattr(properties, 'items'):
+                properties = properties.items()
             for key, val in properties:
                 listitem.set_property(key, val)
 
