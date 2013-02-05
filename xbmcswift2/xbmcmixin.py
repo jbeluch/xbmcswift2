@@ -293,25 +293,24 @@ class XBMCMixin(object):
             item = xbmcswift2.ListItem.from_dict(**item)
         return item
 
-    def set_resolved_url(self, url=None, item=None):
+    def set_resolved_url(self, item=None):
         '''Takes a url or a listitem to be played. Used in conjunction with a
         playable list item with a path that calls back into your addon.
 
         :param url:
                     .. deprecated:: 0.3.0
                     Use `item` instead. A playable URL.
-        :param item: A playable list item.
+        :param item: A playable list item or url.
+                     None item will tell xbmc the resolve failed.
         '''
-        if url:
-            log.warning('The "url" param has been deprecated. Please use the '
-                        '"item" param instead.')
+        if item is None:
+            # None item/url indicates the resolve url failed.
+            xbmcplugin.setResolvedUrl(self.handle, False, xbmcswift2.ListItem().as_xbmc_listitem())
+            return
 
-        if url is None and item is None:
-            raise ValueError('Either url or item must have a non-None value.')
-
-        # if a url was provided, ignore any value passed for item
-        if url:
-            item = {'path': url}
+        if isinstance(item, basestring):
+            # caller set the resolved url without argument keyword
+            item = {'path': item}
 
         item = self._listitemify(item)
         item.set_played(True)
