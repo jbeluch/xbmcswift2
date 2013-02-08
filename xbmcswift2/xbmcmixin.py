@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import shelve
+import urllib
 from datetime import timedelta
 from functools import wraps
 
@@ -308,12 +309,42 @@ class XBMCMixin(object):
             item = xbmcswift2.ListItem.from_dict(**item)
         return item
 
-    def set_resolved_url(self, item=None):
+    def _add_subtitles(self, subtitles):
+        '''Adds subtitles to playing video.
+
+        :param subtitles: A URL to a remote subtitles file or a local filename
+                          for a subtitles file.
+
+        .. warning:: You must start playing a video before calling this method
+                     or it will loop for an indefinite length.
+        '''
+        # This method is named with an underscore to suggest that callers pass
+        # the subtitles argument to set_resolved_url instead of calling this
+        # method directly. This is to ensure a video is played before calling
+        # this method.
+        filename = subtitles
+        if subtitles.startswith('http'):
+            filename, _ = urllib.urlretrieve(subtitles)
+
+        player = xbmc.Player()
+        for _ in xrange(30):
+            if player.isPlaying():
+                break
+            time.sleep(1)
+        else:
+            raise Exception('No video playing. Aborted after 30 seconds.')
+
+        player.setSubtitles(filename)
+
+    def set_resolved_url(self, item=None, subtitles=None):
         '''Takes a url or a listitem to be played. Used in conjunction with a
         playable list item with a path that calls back into your addon.
 
         :param item: A playable list item or url. Pass None to alert XBMC of a
                      failure to resolve the item.
+        :param subtitles: A URL to a remote subtitles file or a local filename
+                          for a subtitles file to be played along with the
+                          item.
         '''
         succeeded = True
         if item is None:
@@ -329,6 +360,10 @@ class XBMCMixin(object):
         item.set_played(True)
         xbmcplugin.setResolvedUrl(self.handle, succeeded,
                                   item.as_xbmc_listitem())
+
+        # call to _add_subtitles must be after setResolvedUrl
+        if subtitles:
+            self._add_subtitles(subtitles)
         return [item]
 
     def play_video(self, item, player=None):
