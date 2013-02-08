@@ -150,7 +150,6 @@ def local_release(xbmc_version=None):
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    path = release_prepare(xbmc_version)
     local_repo, dist_repo = release_prepare(xbmc_version)
     print 'Development release created at %s' % dist_repo.path
 
