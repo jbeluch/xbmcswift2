@@ -144,7 +144,7 @@ class XBMCMixin(object):
                 ret = xbmcgui.Dialog().select('A storage file is corrupted. It'
                                               ' is recommended to clear it.',
                                               choices)
-                if choices[ret] == 'Clear storage':
+                if ret == 0:
                     os.remove(filename)
                     storage = TimedStorage(filename, file_format, TTL)
                 else:
