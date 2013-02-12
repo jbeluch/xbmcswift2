@@ -60,7 +60,9 @@ Bugs, patches and suggestions are all welcome. I'm working on adding tests and
 getting better coverage. Please ensure that your patches include tests as well
 as updates to the documentation. Thanks!
 
-## Contact
+## Support
+
+\#xbmcswift on freenode
 
 https://github.com/jbeluch/xbmcswift2
 
