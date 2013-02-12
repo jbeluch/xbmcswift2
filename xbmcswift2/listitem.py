@@ -212,11 +212,8 @@ class ListItem(object):
                 listitem.set_property(key, val)
 
         if stream_info:
-            assert isinstance(stream_info, dict)
-            for stream_type in ('video', 'audio', 'subtitle'):
-                if stream_type in stream_info:
-                    stream_values = stream_info[stream_type]
-                    listitem.add_stream_info(stream_type, stream_values)
+            for stream_type, stream_values in stream_info.items():
+                listitem.add_stream_info(stream_type, stream_values)
 
         if context_menu:
             listitem.add_context_menu_items(context_menu, replace_context_menu)
