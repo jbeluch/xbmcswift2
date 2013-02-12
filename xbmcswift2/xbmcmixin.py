@@ -161,7 +161,12 @@ class XBMCMixin(object):
         '''Returns the localized string from strings.xml for the given
         stringid.
         '''
-        return self.addon.getLocalizedString(stringid)
+        stringid = int(stringid)
+        if not hasattr(self, '_strings'):
+            self._strings = {}
+        if not stringid in self._strings:
+            self._strings[stringid] = self.addon.getLocalizedString(stringid)
+        return self._strings[stringid]
 
     def set_content(self, content):
         '''Sets the content type for the plugin.'''

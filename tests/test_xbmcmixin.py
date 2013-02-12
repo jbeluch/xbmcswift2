@@ -57,6 +57,10 @@ class TestXBMCMixin(TestCase):
     def test_get_string(self):
         self.m.addon.getLocalizedString.return_value = 'Hello XBMC'
         self.assertEqual('Hello XBMC', self.m.get_string('30000'))
+        # check if the string comes from cache
+        self.m.addon.getLocalizedString.return_value = ''
+        self.assertEqual('Hello XBMC', self.m.get_string('30000'))
+        # check if retrieval by int and str returns same (and comes from cache)
         self.assertEqual('Hello XBMC', self.m.get_string(30000))
 
     @patch('xbmcswift2.xbmcplugin')
