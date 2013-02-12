@@ -83,6 +83,14 @@ class TestListItem(TestCase):
             item.set_info('video', {'title': '300'})
         mock_setInfo.assert_called_with('video', {'title': '300'})
 
+    def test_stream_info(self):
+        with patch.object(xbmcgui.ListItem, 'addStreamInfo') as mock_stream_info:
+            item = ListItem()
+            item.add_stream_info('video', {'duration': 185})
+            mock_stream_info.assert_called_with('video', {'duration': 185})
+            item.add_stream_info('audio', {'languange': 'en'})
+            mock_stream_info.assert_called_with('audio', {'languange': 'en'})
+
     def test_selected(self):
         item = ListItem()
         self.assertEqual(item.selected, False)
@@ -185,10 +193,14 @@ class TestFromDict(TestCase):
             'info': {'title': 'My title'},
             'info_type': 'pictures',
             'properties': [('StartOffset', '256.4')],
+            'stream_info': {
+                'video': {'duration': 185}
+            },
             'context_menu': [('label', 'action')],
             'is_playable': True}
         with patch.object(ListItem, 'set_info', spec=True) as mock_set_info:
-            item = ListItem.from_dict(**dct)
+            with patch.object(ListItem, 'add_stream_info', spec=True) as mock_set_stream_info:
+                item = ListItem.from_dict(**dct)
         self.assertEqual(item.label, 'foo')
         self.assertEqual(item.label2, 'bar')
         self.assertEqual(item.icon, 'icon')
@@ -196,6 +208,7 @@ class TestFromDict(TestCase):
         self.assertEqual(item.path, 'plugin://my.plugin.id/')
         self.assertEqual(item.selected, True)
         mock_set_info.assert_called_with('pictures', {'title': 'My title'})
+        mock_set_stream_info.assert_called_with('video', {'duration': 185})
         self.assertEqual(item.get_property('StartOffset'), '256.4')
         self.assertEqual(item.get_context_menu_items(), [('label', 'action')])
         self.assertEqual(item.get_property('isPlayable'), 'true')
