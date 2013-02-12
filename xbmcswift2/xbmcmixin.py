@@ -322,10 +322,6 @@ class XBMCMixin(object):
         # the subtitles argument to set_resolved_url instead of calling this
         # method directly. This is to ensure a video is played before calling
         # this method.
-        filename = subtitles
-        if subtitles.startswith('http'):
-            filename, _ = urllib.urlretrieve(subtitles)
-
         player = xbmc.Player()
         for _ in xrange(30):
             if player.isPlaying():
@@ -334,7 +330,7 @@ class XBMCMixin(object):
         else:
             raise Exception('No video playing. Aborted after 30 seconds.')
 
-        player.setSubtitles(filename)
+        player.setSubtitles(subtitles)
 
     def set_resolved_url(self, item=None, subtitles=None):
         '''Takes a url or a listitem to be played. Used in conjunction with a
