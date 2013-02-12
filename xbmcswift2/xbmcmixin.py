@@ -346,6 +346,12 @@ class XBMCMixin(object):
                           for a subtitles file to be played along with the
                           item.
         '''
+        if self._end_of_directory:
+            raise Exception('Current XBMC handle has been removed. Either '
+                            'set_resolved_url(), end_of_directory(), or '
+                            'finish() has already been called.')
+        self._end_of_directory = True
+
         succeeded = True
         if item is None:
             # None item indicates the resolve url failed.
