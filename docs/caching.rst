@@ -61,7 +61,7 @@ time the addon is run. So we can use the caching decorator with a TTL argument.
 
 .. sourcecode:: python
 
-    @plugin.cache(TTL=60*24)
+    @plugin.cached(TTL=60*24)
     def get_api_data();
         # make remote request
         data = get_remote_data()
