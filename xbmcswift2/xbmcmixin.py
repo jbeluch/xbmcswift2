@@ -343,6 +343,12 @@ class XBMCMixin(object):
 
         :param item: A playable list item or url. Pass None to alert XBMC of a
                      failure to resolve the item.
+
+                     .. warning:: When using set_resolved_url you should ensure
+                                  the initial playable item (which calls back
+                                  into your addon) doesn't have a trailing
+                                  slash in the URL. Otherwise it won't work
+                                  reliably with XBMC's PlayMedia().
         :param subtitles: A URL to a remote subtitles file or a local filename
                           for a subtitles file to be played along with the
                           item.
