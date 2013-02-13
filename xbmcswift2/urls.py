@@ -50,7 +50,11 @@ class UrlRule(object):
         self._url_format = self._url_rule.replace('<', '{').replace('>', '}')
 
         # Make a regex pattern for matching incoming URLs
-        p = self._url_rule.replace('<', '(?P<').replace('>', '>[^/]+?)')
+        rule = self._url_rule
+        if rule != '/':
+            # Except for a path of '/', the trailing slash is optional.
+            rule = self._url_rule.rstrip('/') + '/?'
+        p = rule.replace('<', '(?P<').replace('>', '>[^/]+?)')
 
         try:
             self._regex = re.compile('^' + p + '$')

@@ -29,3 +29,19 @@ class TestUrls(unittest.TestCase):
         # allow ints
         path_qs = rule.make_path_qs({'video_id': 24})
         self.assertEqual(path_qs, '/videos?video_id=24')
+
+class TestUrlRule(unittest.TestCase):
+
+    def test_match_without_trailing_slash(self):
+        def view():
+            pass
+        rule = UrlRule('/videos/', view, view.__name__, {})
+        self.assertEqual((view, {}), rule.match('/videos'))
+
+    def test_match_with_trailing_slash(self):
+        def view():
+            pass
+        rule = UrlRule('/videos', view, view.__name__, {})
+        self.assertEqual((view, {}), rule.match('/videos/'))
+
+
