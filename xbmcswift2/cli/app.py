@@ -158,7 +158,7 @@ def once(plugin, parent_stack=None):
     if parent_stack:
         items.insert(0, parent_stack[-1])
 
-    display_listitems(items)
+    display_listitems(items, plugin.request.url)
     return items
 
 

@@ -17,7 +17,7 @@ def get_max_len(items):
         return 0
 
 
-def display_listitems(items):
+def display_listitems(items, url):
     '''Displays a list of items along with the index to enable a user
     to select an item.
     '''
@@ -38,6 +38,9 @@ def display_listitems(items):
         output.append('-' * line_width)
 
         header = [
+            '',
+            '=' * line_width,
+            'Current URL: %s' % url,
             '-' * line_width,
             '%s %s Path' % ('#'.center(num_width + 2),
                             'Label'.ljust(label_width)),
