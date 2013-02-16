@@ -47,16 +47,20 @@ Now we can create our virtualenv::
 
     $ mkvirtualenv xbmcswift2
 
-When this completes, your prompt should now be preceded by `(xbmcswift2)`.
-Now we install xbmcswift2::
+When this completes, your prompt should now be preceded by `(xbmcswift2)`. The
+new prompt signals that we are now working within our virtualenv. Any libraries
+that we install via pip will only be available in this environment. Now we'll
+install xbmcswift2::
 
     $ pip install xbmcswift2
 
 Everything should be good to go. When you would like to work on your project
-again, simply::
+in the future, issue the following command to start your virtual env::
 
     $ workon xbmcswift2
 
 and to deactive the virtualenv::
 
     $ deactivate
+
+You should check out the :ref:`commandline` page next.

@@ -1,14 +1,12 @@
 .. _caching:
 
 
-Caching
-=======
+Caching and Storage
+===================
 
-xbmcswift2 offers lots of caching options to help improve the user experience
-for your addon. xbmcswift2 offers a storage mechanism that allows you to store
-arbitrary python objects to use across requests. The storage options also allow
-for an optionan lifetime to be specified for each object.
-
+xbmcswift2 offers a few options for caching and storage to help improve the
+user experience of your addon. swift offers a simple storage mechanism that
+allows you to store arbitraty python objects to use between requests.
 
 Storing Arbitraty Python Objects
 --------------------------------
