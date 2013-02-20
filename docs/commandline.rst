@@ -11,7 +11,7 @@ Commands
 When running xbmcswift2 from the command line, there are two commands
 available, *create* and *run*. *create* is a script that will create the basic
 scaffolding and necessary files for an XBMC addon and personalize it by asking
-a few questions. *run* enables you to debug your addon on the command line.
+you a few questions. *run* enables you to debug your addon on the command line.
 
 To see the command line help, simply execute ``xbmcswift2 -h``. Both of the
 commands are explained further below.

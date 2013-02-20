@@ -31,8 +31,17 @@ Request
     :inherited-members:
 
 
+Actions
+-------
+
+.. automodule:: xbmcswift2.actions
+    :members:
+
+
 Extended API
 ------------
+
+.. module:: xbmcswift2 
 
 Module
 ``````

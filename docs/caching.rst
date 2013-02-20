@@ -8,6 +8,13 @@ xbmcswift2 offers a few options for caching and storage to help improve the
 user experience of your addon. swift offers a simple storage mechanism that
 allows you to store arbitraty python objects to use between requests.
 
+.. warning::
+    
+    The current implementation of xbmcswift2's storage is very basic and is not
+    thread safe. If your addon does background calls via the context menu and
+    manipulates storages in these backgound threads, you might run into some
+    issues.
+
 Storing Arbitraty Python Objects
 --------------------------------
 
@@ -88,6 +95,10 @@ for this decorator; it defaults to 24 hours.
              cache the view. See the below section 'Caveats' for more
              information.
 
+.. warning:: It is currently only possible to attach a single cached_route to a
+             view. If you have multiple routes on a given view, try refactoring
+             some logic out to a new function that can be cached, instead of
+             using the cached_route decorator.
 Caveats
 -------
 
