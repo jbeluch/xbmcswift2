@@ -46,7 +46,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'xbmcswift2',
-    version = '0.3.0',
+    version = '0.4.0-dev',
     author = 'Jonathan Beluch',
     author_email = 'web@jonathanbeluch.com',
     description = 'A micro framework for rapid development of XBMC plugins.',
