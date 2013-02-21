@@ -7,87 +7,28 @@ Addons Powered by xbmcswift2
 Want your addon included here? Send me an email at web@jonathanbeluch.com with
 your addon name and a link to a repository (XBMC's git repo is fine).
 
-Academic Earth
---------------
+========================    =============================================================
+Addon                       Source
+========================    =============================================================
+`Academic Earth`_           https://github.com/jbeluch/xbmc-academic-earth
+`Documentary.net`_          https://github.com/jbeluch/plugin.video.documentary.net
+`VimCasts`_                 https://github.com/jbeluch/xbmc-vimcasts
+`Radio`_                    https://github.com/dersphere/plugin.audio.radio_de
+`Shoutcast 2`_              https://github.com/dersphere/plugin.audio.shoutcast
+`Cheezburger Network`_      https://github.com/dersphere/plugin.image.cheezburger_network
+`Apple Itunes Podcasts`_    https://github.com/dersphere/plugin.video.itunes_podcasts
+`MyZen.tv`_                 https://github.com/dersphere/plugin.video.myzen_tv
+`Rofl.to`_                  https://github.com/dersphere/plugin.video.rofl_to
+`Wimp`_                     https://github.com/dersphere/plugin.video.wimp
+========================    =============================================================
 
-Watch lectures from Academic Earth within the XBMC interface.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.academicearth/>`_
-* `view source <https://github.com/jbeluch/xbmc-academic-earth>`_
-
-Documentary.net
----------------
-
-Watch documentaries from http://documentary.net.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.documentary.net/>`_
-* `view source <https://github.com/jbeluch/plugin.video.documentary.net>`_
-
-VimCasts
---------
-
-Watch screencasts from http://vimcasts.org.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.vimcasts/>`_
-* `view source <https://github.com/jbeluch/xbmc-vimcasts>`_
-
-
-Radio
------
-
-Music plugin to access over 4000 international radio broadcasts from rad.io, radio.de and radio.fr.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.audio.radio_de/>`_
-* `view source <https://github.com/dersphere/plugin.audio.radio_de>`_
-
-
-Shoutcast 2
------------
-
-Browse more than 50.000 free internet radio stations.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.audio.shoutcast>`_
-* `view source <https://github.com/dersphere/plugin.audio.shoutcast>`_
-
-
-Cheezburger Network
--------------------
-
-Cheezburger: All your funny in one place.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.image.cheezburger_network>`_
-* `view source <https://github.com/dersphere/plugin.image.cheezburger_network>`_
-
-
-Apple Itunes Podcasts
----------------------
-
-Browse and search for thousands of free audio and video podcasts.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.itunes_podcasts>`_
-* `view source <https://github.com/dersphere/plugin.video.itunes_podcasts>`_
-
-
-MyZen.tv
---------
-
-Watch the Free Exercises from the well-being website www.myzen.tv.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.myzen_tv>`_
-* `view source <https://github.com/dersphere/plugin.video.myzen_tv>`_
-
-Rofl.to
--------
-
-Daily updated funny videos + clips. Your #1 resource for fun videos.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.rofl_to>`_
-* `view source <https://github.com/dersphere/plugin.video.rofl_to>`_
-
-Wimp
-----
-
-A collection of the best online videos. Our editors make sure clips added are family friendly.
-
-* `info <http://xbmcaddonbrowser.com/addons/eden/plugin.video.wimp>`_
-* `view source <https://github.com/dersphere/plugin.video.wimp>`_
+.. _Academic Earth: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.academicearth/
+.. _Documentary.net: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.documentary.net/
+.. _VimCasts: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.vimcasts/
+.. _Radio: http://xbmcaddonbrowser.com/addons/frodo/plugin.audio.radio_de/
+.. _Shoutcast 2: http://xbmcaddonbrowser.com/addons/frodo/plugin.audio.shoutcast
+.. _Cheezburger Network: http://xbmcaddonbrowser.com/addons/frodo/plugin.image.cheezburger_network
+.. _Apple Itunes Podcasts: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.itunes_podcasts
+.. _MyZen.tv: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.myzen_tv
+.. _Rofl.to: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.rofl_to
+.. _Wimp: http://xbmcaddonbrowser.com/addons/frodo/plugin.video.wimp

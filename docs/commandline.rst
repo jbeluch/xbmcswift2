@@ -1,32 +1,41 @@
 .. _commandline:
 
 
-Running Addons on the Command Line
-==================================
+Running xbmcswift2 on the Command Line
+======================================
 
 
-Options
--------
+Commands
+--------
 
-To see the command line help, simply execute ``xbmcswift2 run -h``.::
+When running xbmcswift2 from the command line, there are two commands
+available, *create* and *run*. *create* is a script that will create the basic
+scaffolding and necessary files for an XBMC addon and personalize it by asking
+you a few questions. *run* enables you to debug your addon on the command line.
 
-    $ xbmcswift2 run -h
-    Usage: xbmcswift2 run [once|interactive|crawl] [url]
-
-    Options:
-      -h, --help     show this help message and exit
-      -q, --quiet    set logging level to quiet
-      -v, --verbose  set logging level to verbose
+To see the command line help, simply execute ``xbmcswift2 -h``. Both of the
+commands are explained further below.
 
 
-There are three different run modes available, once_ (default),
-interactive_, and crawl_.
+create
+~~~~~~
 
-There is also a second positional argument which is optional, ``url``. By
-default, xbmcswift2 will run the root URL,
+To create a new addon, change your current working directory to a location
+where you want your addon folder to be created. Then execute ``xbmcswift2
+create``. After answering a few questions, you should have the basic addon
+structure in place.
+
+run
+~~~
+
+When running an addon on the command line, there are three different run modes
+available, once_, interactive_, and crawl_. 
+
+There is also a second positional argument, ``url``, which is optional. By
+default, xbmcswift2 will run the root URL of your addon (a path of '/'), e.g.
 ``plugin://plugin.video.academicearth/``. This is the same default URL that
-XBMC uses when you first enter an addon. You can gather runnable URLs from the
-output of xbmcswift2.
+XBMC uses when you first enter an addon. You can gather URLs from the output of
+xbmcswift2.
 
 The options ``-q`` and ``-v`` decrease and increase the logging level.
 
@@ -35,27 +44,29 @@ The options ``-q`` and ``-v`` decrease and increase the logging level.
     To enable running on the command line, xbmcswift2 attempts to mock a
     portion of the XBMC python bindings. Certain functions behave properly like
     looking up strings. However, if a function has not been implemented,
-    xbmcswift2 lets the function call pass silently to avoid Exceptions and
-    allow the plugin to run in a limited fashion. This is why you'll very often
-    see WARNING log messages when running on the command line.
+    xbmcswift2 lets the function call pass silently to avoid exceptions and
+    allow the plugin to run in a limited fashion. This is why you'll often see
+    WARNING log messages when running on the command line.
 
-    This is also why you should import the xbmc python modules from xbmcswift2::
+    If you plan on using the command line to develop your addons, you should
+    always import the xbmc modules from xbmcswift2::
 
         from xbcmswift2 import xbmcgui
 
-    xbmcswift2 will correctly import the proper XBMC modules in the correct
-    environments so you don't have to worry about it.
-
-
+    xbmcswift2 will correctly import the proper module based on the
+    environment. When running in XBMC, it will import the actual modules, and
+    when running on the command line it will import mocked modules without
+    error.
 
 
 once
-~~~~
+____
 
 Executes the addon once then quits. Useful for testing when used
 with the optional ``url`` argument.::
 
-    $ xbmcswift2 run once 2>/dev/null
+    $ xbmcswift2 run once # you can omit the once argument as it is the default
+
     ------------------------------------------------------------
      #  Label    Path
     ------------------------------------------------------------
@@ -63,8 +74,20 @@ with the optional ``url`` argument.::
     ------------------------------------------------------------
 
 
+    $ xbmcswift2 run once plugin://plugin.video.academicearth/subjects/
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------
+     #   Label                    Path
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------
+     [ 0] ACT                      (plugin://plugin.video.academicearth/subjects/http%3A%2F%2Fwww.academicearth.org%2Fsubjects%2Fact/)
+     [ 1] Accounting               (plugin://plugin.video.academicearth/subjects/http%3A%2F%2Fwww.academicearth.org%2Fsubjects%2Faccounting/)
+     [ 2] Algebra                  (plugin://plugin.video.academicearth/subjects/http%3A%2F%2Fwww.academicearth.org%2Fsubjects%2Falgebra/)
+     [ 3] Anthropology             (plugin://plugin.video.academicearth/subjects/http%3A%2F%2Fwww.academicearth.org%2Fsubjects%2Fanthropology/)
+     [ 4] Applied CompSci          (plugin://plugin.video.academicearth/subjects/http%3A%2F%2Fwww.academicearth.org%2Fsubjects%2Fapplied-computer-science/)
+     ...
+
+
 interactive
-~~~~~~~~~~~
+___________
 
 Allows the user to step through their addon using an interactive session. This
 is meant to mimic the basic XBMC interface of clicking on a listitem, which
@@ -72,7 +95,7 @@ then brings up a new directory listing. After each listing is displayed the
 user will be prompted for a listitem to select.  There will always be a ``..``
 option to return to the previous directory (except for the initial URL).::
 
-    (xbmc-academic-earth)jon@lenovo ~/Code/xbmc-academic-earth (master) $ xbmcswift2 run interactive 2>/dev/null
+    $ xbmcswift2 run interactive
     ------------------------------------------------------------
      #  Label    Path
     ------------------------------------------------------------
@@ -100,12 +123,12 @@ option to return to the previous directory (except for the initial URL).::
 
 
 crawl
-~~~~~
+_____
 
 Used to crawl every available path in your addon. In between each request the
 user will be prompted to hit Enter to continue.::
 
-    Choose an item or "q" to quit: (xbmc-academic-earth)jon@lenovo ~/Code/xbmc-academic-earth (master) $ xbmcswift2 run crawl 2>/dev/null
+    $ xbmcswift2 run crawl 2>/dev/null
     ------------------------------------------------------------
      #  Label    Path
     ------------------------------------------------------------

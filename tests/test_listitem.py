@@ -21,7 +21,7 @@ class TestListItem(TestCase):
         self.assertEqual(item.label, 'bar')
         item.set_label('baz')
         self.assertEqual(item.get_label(), 'baz')
-        
+
     def test_label2(self):
         item = ListItem('foo')
         self.assertIsNone(item.label2)
@@ -41,7 +41,7 @@ class TestListItem(TestCase):
         item.set_icon('baz')
         self.assertEqual(item.icon, 'baz')
         self.assertEqual(item.get_icon(), 'baz')
-        
+
     def test_thumbnail(self):
         item = ListItem()
         self.assertIsNone(item.thumbnail)
@@ -82,6 +82,14 @@ class TestListItem(TestCase):
             item = ListItem()
             item.set_info('video', {'title': '300'})
         mock_setInfo.assert_called_with('video', {'title': '300'})
+
+    def test_stream_info(self):
+        with patch.object(xbmcgui.ListItem, 'addStreamInfo') as mock_stream_info:
+            item = ListItem()
+            item.add_stream_info('video', {'duration': 185})
+            mock_stream_info.assert_called_with('video', {'duration': 185})
+            item.add_stream_info('audio', {'languange': 'en'})
+            mock_stream_info.assert_called_with('audio', {'languange': 'en'})
 
     def test_selected(self):
         item = ListItem()
@@ -136,7 +144,7 @@ class TestListItem(TestCase):
     @patch('xbmcswift2.xbmcgui.ListItem.setProperty')
     def test_set_property(self, mock_setProperty):
         item = ListItem()
-        item.set_property('foo', 'bar') 
+        item.set_property('foo', 'bar')
         mock_setProperty.assert_called_with('foo', 'bar')
 
     def test_as_tuple(self):
@@ -160,6 +168,20 @@ class TestListItemAsserts(TestCase):
 
 
 class TestFromDict(TestCase):
+
+    def test_from_dict_props(self):
+        dct = {
+            'properties': {'StartOffset': '256.4'},
+        }
+        item = ListItem.from_dict(**dct)
+        self.assertEqual(item.get_property('StartOffset'), '256.4')
+
+        dct = {
+            'properties': [('StartOffset', '256.4')],
+        }
+        item = ListItem.from_dict(**dct)
+        self.assertEqual(item.get_property('StartOffset'), '256.4')
+
     def test_from_dict(self):
         dct = {
             'label': 'foo',
@@ -171,10 +193,14 @@ class TestFromDict(TestCase):
             'info': {'title': 'My title'},
             'info_type': 'pictures',
             'properties': [('StartOffset', '256.4')],
+            'stream_info': {
+                'video': {'duration': 185}
+            },
             'context_menu': [('label', 'action')],
             'is_playable': True}
         with patch.object(ListItem, 'set_info', spec=True) as mock_set_info:
-            item = ListItem.from_dict(**dct)
+            with patch.object(ListItem, 'add_stream_info', spec=True) as mock_set_stream_info:
+                item = ListItem.from_dict(**dct)
         self.assertEqual(item.label, 'foo')
         self.assertEqual(item.label2, 'bar')
         self.assertEqual(item.icon, 'icon')
@@ -182,8 +208,9 @@ class TestFromDict(TestCase):
         self.assertEqual(item.path, 'plugin://my.plugin.id/')
         self.assertEqual(item.selected, True)
         mock_set_info.assert_called_with('pictures', {'title': 'My title'})
+        mock_set_stream_info.assert_called_with('video', {'duration': 185})
         self.assertEqual(item.get_property('StartOffset'), '256.4')
-        self.assertEqual(item.get_context_menu_items(), [('label', 'action')]) 
+        self.assertEqual(item.get_context_menu_items(), [('label', 'action')])
         self.assertEqual(item.get_property('isPlayable'), 'true')
         self.assertEqual(item.is_folder, False)
 

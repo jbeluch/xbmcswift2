@@ -27,7 +27,8 @@ REPO_PUBLIC_URL = 'git://github.com/jbeluch/xbmcswift2-xbmc-dist.git'
 BRANCHES = {
     # <xbmc_version>: <git_branch>
     'DHARMA': 'dharma',
-    'EDEN': 'master',
+    'EDEN': 'eden',
+    'FRODO': 'master',
 }
 
 
@@ -66,9 +67,9 @@ class GitRepo(object):
         with lcd(self.path):
             local('git push --tags origin %s' % branch)
 
-    def tag(self, version, xbmc_version):
+    def tag(self, tag, message):
         with lcd(self.path):
-            local('git tag -a %s -m "%s v%s"' % (version, xbmc_version, version))
+            local('git tag -a %s -m "%s"' % (tag, message))
 
     def commit(self, version):
         with lcd(self.path):
@@ -149,8 +150,9 @@ def local_release(xbmc_version=None):
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    path = release_prepare(xbmc_version)
-    print 'Development release created at %s' % path
+    local_repo, dist_repo = release_prepare(xbmc_version)
+    print 'Development release created at %s' % dist_repo.path
+
 
 @task
 def release(xbmc_version=None):
@@ -160,8 +162,8 @@ def release(xbmc_version=None):
     if xbmc_version not in BRANCHES.keys():
         abort('Invalid XBMC version, [dharma, eden]')
 
-    dist_path = release_prepare(xbmc_version)
-    release_perform(xbmc_version, dist_path)
+    local_repo, dist_repo = release_prepare(xbmc_version)
+    release_perform(xbmc_version, local_repo, dist_repo)
 
 
 def release_prepare(xbmc_version):
@@ -212,24 +214,25 @@ def release_prepare(xbmc_version):
     # if user doesn't want to continue they shouldu be able to :cq
     returncode = subprocess.check_call([EDITOR, changelog])
 
-    # return path to new dist repo
-    return dist_path
+    # return both repos
+    return local_repo, GitRepo(path=dist_path)
 
 
-def release_perform(xbmc_version, dist_path):
-    dist_repo = GitRepo(path=dist_path)
-
+def release_perform(xbmc_version, local_repo, dist_repo):
     # Stage everything in the repo
     log('Staging all modified files in the distribution repo...')
     dist_repo.stage_all()
 
     # Get the current XBMC version
-    version = get_addon_version(dist_path)
+    version = get_addon_version(dist_repo.path)
 
     # Commit all staged changes and tag
     log('Commiting changes and tagging the release...')
     dist_repo.commit(version)
-    dist_repo.tag(version, xbmc_version.lower())
+    dist_repo.tag(version, '%s v%s' % (xbmc_version, version))
+
+    # Tag the local repo as well
+    local_repo.tag('xbmc-%s' % version, 'XBMC distribution v%s' % version)
 
     # Push everything
     log('Pushing changes to remote...')
@@ -238,5 +241,5 @@ def release_perform(xbmc_version, dist_path):
     puts(colors.green('Release performed.'))
 
     # write the email
-    addon_id = get_addon_id(dist_path)
+    addon_id = get_addon_id(dist_repo.path)
     print_email(addon_id, version, REPO_PUBLIC_URL, version, xbmc_version.lower())

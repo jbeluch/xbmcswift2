@@ -29,6 +29,8 @@ class TestMixedIn(XBMCMixin):
 
 class MixedIn(XBMCMixin):
 
+    storage_path = '/tmp'
+
     def __init__(self, **kwargs):
         for attr_name, attr_value in kwargs.items():
             setattr(self, attr_name, attr_value)
@@ -55,6 +57,10 @@ class TestXBMCMixin(TestCase):
     def test_get_string(self):
         self.m.addon.getLocalizedString.return_value = 'Hello XBMC'
         self.assertEqual('Hello XBMC', self.m.get_string('30000'))
+        # check if the string comes from cache
+        self.m.addon.getLocalizedString.return_value = ''
+        self.assertEqual('Hello XBMC', self.m.get_string('30000'))
+        # check if retrieval by int and str returns same (and comes from cache)
         self.assertEqual('Hello XBMC', self.m.get_string(30000))
 
     @patch('xbmcswift2.xbmcplugin')
@@ -65,6 +71,26 @@ class TestXBMCMixin(TestCase):
     def test_get_setting(self):
         self.m.get_setting('username')
         assert self.m.addon.getSetting.called_with(id='username')
+        # Test int
+        self.m.addon.getSetting.return_value = '3'
+        self.assertEqual(self.m.get_setting('int'), '3')
+        self.assertEqual(self.m.get_setting('int', int), 3)
+        # Test bool
+        self.m.addon.getSetting.return_value = 'true'
+        self.assertEqual(self.m.get_setting('bool'), 'true')
+        self.assertEqual(self.m.get_setting('bool', bool), True)
+        self.m.addon.getSetting.return_value = 'false'
+        self.assertEqual(self.m.get_setting('bool'), 'false')
+        self.assertEqual(self.m.get_setting('bool', bool), False)
+        # Test unicode
+        self.m.addon.getSetting.return_value = 'd\xc3\xb6ner'
+        self.assertEqual(self.m.get_setting('unicode'), 'd\xc3\xb6ner')
+        self.assertEqual(self.m.get_setting('unicode', unicode), u'd\xf6ner')
+        # Test list
+        self.m.addon.getSetting.return_value = '2'
+        lst = ('1', 2, True, False)
+        self.assertEqual(self.m.get_setting('list'), '2')
+        self.assertEqual(self.m.get_setting('list', choices=lst), lst[2])
 
     def test_set_setting(self):
         self.m.set_setting('username', 'xbmc')
@@ -75,7 +101,19 @@ class TestXBMCMixin(TestCase):
         assert self.m.addon.openSettings.called
 
     def test_set_resolved_url(self):
-        raise SkipTest('Test not implemented.')
+        url = 'http://www.example.com/video.mp4'
+        ret = self.m.set_resolved_url(url)
+        item = ret[0]
+        self.assertIsInstance(item, xbmcswift2.ListItem)
+        self.assertTrue(item.get_played())
+
+    def test_set_resolved_url2(self):
+        item = {'path': 'http://www.example.com/video.mp4'}
+        ret = self.m.set_resolved_url(item=item)
+        item = ret[0]
+        self.assertIsInstance(item, xbmcswift2.ListItem)
+        self.assertTrue(item.get_played())
+
 
     @patch.object(xbmc, 'Player')
     @patch('xbmcswift2.ListItem', wraps=xbmcswift2.ListItem)
@@ -175,6 +213,26 @@ class TestXBMCMixin(TestCase):
         with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
             plugin.keyboard()
         mockKeyboard.assert_called_with('', 'Academic Earth', False)
+
+
+    def test_clear_function_cache(self):
+        plugin = MixedIn(storage_path=tempfile.mkdtemp(),
+                         addon=Mock(),
+                         added_items=[],
+                         request=Mock(),
+                         info_type='pictures',
+                         handle=0,
+                         )
+        @plugin.cached()
+        def echo(msg):
+            return msg
+        echo('hello')
+
+        # cache should now contain 1 item
+        storage = plugin.get_storage('.functions')
+        self.assertEqual(len(storage.items()), 1)
+        plugin.clear_function_cache()
+        self.assertEqual(len(storage.items()), 0)
 
 
 class TestAddItems(TestCase):

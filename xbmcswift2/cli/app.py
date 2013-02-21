@@ -144,16 +144,21 @@ def patch_plugin(plugin, path, handle=None):
     plugin._end_of_directory = False
 
 
-def once(plugin, parent_item=None):
+def once(plugin, parent_stack=None):
     '''A run mode for the CLI that runs the plugin once and exits.'''
     plugin.clear_added_items()
     items = plugin.run()
 
-    # Prepend the parent_item if given
-    if parent_item is not None:
-        items.insert(0, parent_item)
+    # if update_listing=True, we need to remove the last url from the parent
+    # stack
+    if parent_stack and plugin._update_listing:
+        del parent_stack[-1]
 
-    display_listitems(items)
+    # if we have parent items, include the most recent in the display
+    if parent_stack:
+        items.insert(0, parent_stack[-1])
+
+    display_listitems(items, plugin.request.url)
     return items
 
 
@@ -175,12 +180,7 @@ def interactive(plugin):
                                                    path=plugin.request.url))
         patch_plugin(plugin, selected_item.get_path())
 
-        # If we have parent items, include the top of the stack in the list
-        # item display
-        parent_item = None
-        if parent_stack:
-            parent_item = parent_stack[-1]
-        items = [item for item in once(plugin, parent_item=parent_item)
+        items = [item for item in once(plugin, parent_stack=parent_stack)
                  if not item.get_played()]
         selected_item = get_user_choice(items)
 

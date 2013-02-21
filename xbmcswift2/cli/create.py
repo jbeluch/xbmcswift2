@@ -14,6 +14,7 @@ from os import getcwd
 from xml.sax import saxutils
 from optparse import OptionParser
 from shutil import copytree, ignore_patterns
+from getpass import getpass
 
 
 class CreateCommand(object):
@@ -88,7 +89,7 @@ def get_valid_value(prompt, validator, default=None):
     return ans
 
 
-def get_value(prompt, default=None):
+def get_value(prompt, default=None, hidden=False):
     '''Displays the provided prompt and returns the input from the user. If the
     user hits Enter and there is a default value provided, the default is
     returned.
@@ -97,7 +98,10 @@ def get_value(prompt, default=None):
     if default:
         _prompt = '%s [%s]: ' % (prompt, default)
 
-    ans = raw_input(_prompt)
+    if hidden:
+        ans = getpass(_prompt)
+    else:
+        ans = raw_input(_prompt)
 
     # If user hit Enter and there is a default value
     if not ans and default:

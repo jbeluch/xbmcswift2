@@ -6,6 +6,7 @@ class ListItem(object):
         self.thumbnailImage = thumbnailImage
         self.path = path
         self.properties = {}
+        self.stream_info = {}
         self.selected = False
         self.infolabels = {}
 
@@ -45,6 +46,9 @@ class ListItem(object):
 
     def setProperty(self, key, value):
         self.properties[key.lower()] = value
+
+    def addStreamInfo(self, stream_type, stream_values):
+        self.stream_info.update({stream_type: stream_values})
 
     def setThumbnailImage(self, thumb):
         self.thumbnailImage = thumb
