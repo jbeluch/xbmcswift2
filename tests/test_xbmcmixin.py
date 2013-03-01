@@ -195,7 +195,7 @@ class TestXBMCMixin(TestCase):
         with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
             plugin.notify('Hello World!')
         mockExecutebuiltin.assert_called_with(
-            'XBMC.Notification("Hello World!", "Academic Earth", "5000", "")'
+            'XBMC.Notification("Academic Earth", "Hello World!", "5000", "")'
         )
 
     @patch('xbmcswift2.xbmc.executebuiltin')
@@ -204,7 +204,7 @@ class TestXBMCMixin(TestCase):
         with patch.object(plugin.addon, 'getAddonInfo', return_value='Academic Earth') as mockGetAddonInfo:
             plugin.notify('Hello World!', 'My Title', 3000, 'http://example.com/image.png')
         mockExecutebuiltin.assert_called_with(
-                'XBMC.Notification("Hello World!", "My Title", "3000", "http://example.com/image.png")'
+                'XBMC.Notification("My Title", "Hello World!", "3000", "http://example.com/image.png")'
         )
 
     @patch('xbmcswift2.xbmc.Keyboard')
