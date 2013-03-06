@@ -189,7 +189,7 @@ class XBMCMixin(object):
 
         :param key: The id of the setting defined in settings.xml.
         :param converter: (Optional) Choices are str, unicode, bool and int.
-        :param converter: (Optional) Choices are instances of list or tuple.
+        :param choices: (Optional) Choices are instances of list or tuple.
 
         Examples:
             * ``plugin.get_setting('per_page', int)``
