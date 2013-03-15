@@ -167,7 +167,7 @@ The last step we need to take before running our addon is to stub out the
     def show_subject_info(url):
         pass
 
-Note that since we are passing a url argument to ``url_for1``, we need to
+Note that since we are passing a url argument to ``url_for``, we need to
 ensure our view can handle the argument. This involves creating a placeholder
 in the url, ``<url>`` and then ensuring our view takes a single argument,
 ``url``. xbmcswift2 will attempt to match incoming URLs against the list of
